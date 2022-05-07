@@ -78,7 +78,7 @@ const getAntdLessLoaders = () => [
 module.exports = {
   // 入口
   entry: {
-    index: "./src/index.tsx",
+    index: "./src/index.js",
   },
   // 输出
   output: {
@@ -95,7 +95,7 @@ module.exports = {
     alias: {
       "@": paths.appSrc,
     },
-    extensions: [".tsx", ".ts", ".js"],
+    extensions: [".jsx", ".js"],
     modules: ["node_modules", paths.appSrc],
     symlinks: false,
   },
@@ -150,7 +150,7 @@ module.exports = {
         use: getAntdLessLoaders(),
       },
       {
-        test: /\.(js|tsx)$/,
+        test: /\.(js|jsx)$/,
         include: paths.appSrc,
         loader: "babel-loader",
         options: {
