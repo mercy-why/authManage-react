@@ -1,6 +1,5 @@
-const chalk = require("chalk");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const ProgressBarPlugin = require("progress-bar-webpack-plugin");
+const WebpackBar = require("webpackbar");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const theme = require("./theme");
 const paths = require("./paths");
@@ -20,12 +19,13 @@ const getCssLoaders = () => {
       loader: "css-loader",
       options: {
         sourceMap: isEnvDevelopment,
-        // esModule: true,
         modules: {
           localIdentName: "[local]--[hash:base64:5]",
           auto: true,
           exportLocalsConvention: "dashesOnly",
         },
+        importLoaders: 1,
+        esModule: false,
       },
     },
   ];
@@ -107,24 +107,28 @@ module.exports = {
       inject: "body",
     }),
     // 进度条
-    new ProgressBarPlugin({
-      format: `  :msg [:bar] ${chalk.green.bold(":percent")} (:elapsed s)`,
-    }),
+    new WebpackBar(),
   ],
   module: {
     rules: [
       {
-        test: [/\.bmp$/, /\.svg$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
+        test: /\.(bmp|svg|gif|jpe?g|png)$/i,
         type: "asset",
         parser: {
           dataUrlCondition: {
             maxSize: 4 * 1024,
           },
         },
+        generator: {
+          filename: "img/[name].[hash:4][ext]",
+        },
       },
       {
-        test: /.(woff|woff2|eot|ttf|otf)$/i,
+        test: /\.(woff2?|eot|ttf|otf)$/i,
         type: "asset/resource",
+        generator: {
+          filename: "font/[name].[hash:3][ext]",
+        },
       },
       {
         test: /\.css$/,
@@ -150,7 +154,7 @@ module.exports = {
         use: getAntdLessLoaders(),
       },
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(jsx?)$/,
         include: paths.appSrc,
         loader: "babel-loader",
         options: {
@@ -161,5 +165,5 @@ module.exports = {
   },
   cache: {
     type: "filesystem", // 使用文件缓存
-  }
+  },
 };
