@@ -97,7 +97,6 @@ module.exports = {
     },
     extensions: [".jsx", ".js"],
     modules: ["node_modules", paths.appSrc],
-    symlinks: false,
   },
   plugins: [
     // 生成html，自动引入所有bundle
