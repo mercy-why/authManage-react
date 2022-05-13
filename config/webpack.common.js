@@ -103,8 +103,7 @@ module.exports = {
     // 生成html，自动引入所有bundle
     new HtmlWebpackPlugin({
       title: "demo",
-      template: paths.appHtml,
-      inject: "body",
+      template: paths.appHtml
     }),
     // 进度条
     new WebpackBar(),

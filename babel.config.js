@@ -9,6 +9,7 @@ module.exports = {
     ],
   ],
   plugins: [
+    ['react-refresh/babel'],
     [
       "@babel/plugin-transform-runtime",
       {
