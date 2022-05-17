@@ -1,8 +1,4 @@
-interface code {
-  [key: number]: string;
-}
-
-const codeMessage: code = {
+const codeMessage = {
   400: "错误的请求",
   401: "请重新登录",
   403: "无权访问",

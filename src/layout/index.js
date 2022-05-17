@@ -12,7 +12,7 @@ export default function Layout() {
     primaryColor: "red",
     splitMenus: false,
     fixedHeader: true,
-    title: "demo",
+    title: "权限管理系统",
   };
   return (
     <ProLayout {...defaultProps}>

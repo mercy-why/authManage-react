@@ -5,6 +5,7 @@ import codeMessage from "./codeMessage";
 const service = axios.create({
   baseURL: "/api",
   timeout: 1000 * 60 * 5,
+  method: 'post',
   auth: {
     username: "janedoe",
     password: "s00pers3cret",
@@ -18,14 +19,6 @@ service.interceptors.request.use((config) => {
 });
 service.interceptors.response.use(
   (response) => {
-    const code = response.data.code;
-    // 请求成功：可以做全局的 toast 展示，或者对 response 做一些格式化
-    if (code === 401) {
-      //   history?.replace({
-      //     pathname: "/login",
-      //     search: `redirect=${history?.location.pathname}`,
-      //   });
-    }
     return response.data;
   },
   (error) => {
