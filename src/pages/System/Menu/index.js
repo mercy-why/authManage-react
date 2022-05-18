@@ -1,9 +1,10 @@
-import ProTable from "@ant-design/pro-table";
-import { initReq, addReq, editReq, deleteReq } from "./services";
+import ProTable, { TableDropdown } from "@ant-design/pro-table";
+import { getList, addReq, editReq, deleteReq } from "./services";
 import { Button, Space, Popconfirm } from "antd";
-import { useReducer, useRef } from "react";
+import { useReducer, useRef, useState } from "react";
 import { BetaSchemaForm } from "@ant-design/pro-form";
 import { defaultModalFormSetting } from "@/settings";
+import BtnModal from "./btnModal";
 
 const defaultRules = [
   {
@@ -11,7 +12,14 @@ const defaultRules = [
     message: "此项为必填项",
   },
 ];
-
+const statusMap = {
+  C: {
+    text: "目录",
+  },
+  M: {
+    text: "菜单",
+  },
+};
 export default function Role() {
   const defaultData = {
     visible: false,
@@ -28,8 +36,13 @@ export default function Role() {
     }
   };
   const [state, dispatch] = useReducer(reducer, defaultData);
+  const [menuTree, setMenuTree] = useState([]);
   const { formData, visible } = state;
   const actionRef = useRef();
+  const [btnState, setBtnState] = useState({
+    visible: false,
+    record: null,
+  });
 
   const editFn = (record) => {
     dispatch({
@@ -37,24 +50,79 @@ export default function Role() {
       record,
     });
   };
+
+  const actionFn = (key, record) => {
+    if (key === "btn") {
+      console.log(record);
+      setBtnState({
+        visible: true,
+        record: record.buttons,
+      });
+    }
+  };
   const columns = [
     {
-      title: "角色名称",
-      dataIndex: "roleName",
+      title: "上级菜单",
+      dataIndex: "menuParentId",
+      hideInTable: true,
+      valueType: "treeSelect",
+      search: false,
+      fieldProps: {
+        options: menuTree,
+        allowClear: true,
+        treeDefaultExpandAll: true,
+        defaultValue: '0',
+        fieldNames: {
+          label: "menuName",
+          value: "menuId",
+        },
+      },
+    },
+    {
+      title: "菜单名称",
+      dataIndex: "menuName",
       formItemProps: {
         rules: defaultRules,
       },
     },
     {
-      title: "权限字符",
-      dataIndex: "roleCode",
+      title: "菜单类型",
+      dataIndex: "menuType",
+      valueEnum: statusMap,
       formItemProps: {
         rules: defaultRules,
       },
+      valueType: "radio",
+      search: false,
+    },
+
+    {
+      title: "路由地址",
+      dataIndex: "menuRouter",
+      formItemProps: {
+        rules: defaultRules,
+      },
+      search: false,
     },
     {
-      title: "显示顺序",
-      dataIndex: "roleSort",
+      title: "组件路径",
+      dataIndex: "menuComponent",
+      formItemProps: {
+        rules: defaultRules,
+      },
+      search: false,
+    },
+    {
+      title: "图标",
+      dataIndex: "menuIcon",
+      formItemProps: {
+        rules: defaultRules,
+      },
+      search: false,
+    },
+    {
+      title: "排序",
+      dataIndex: "menuSort",
       valueType: "digit",
       formItemProps: {
         rules: defaultRules,
@@ -71,7 +139,7 @@ export default function Role() {
           status: "Success",
         },
         0: {
-          text: "禁用",
+          text: "停用",
           status: "Error",
         },
       },
@@ -79,22 +147,6 @@ export default function Role() {
         rules: defaultRules,
       },
       search: false,
-    },
-    {
-      title: "创建时间",
-      dataIndex: "createTime",
-      formItemProps: {
-        rules: defaultRules,
-      },
-      hideInSearch: true,
-      hideInForm: true,
-      valueType: "dateTime",
-    },
-    {
-      title: "描述",
-      dataIndex: "remark",
-      hideInSearch: true,
-      ellipsis: true,
     },
     {
       title: "操作",
@@ -110,12 +162,22 @@ export default function Role() {
             okText="是"
             cancelText="否"
             onConfirm={async () => {
-              await deleteReq({ roleId: record.roleId });
+              await deleteReq({ menuId: record.menuId });
               actionRef?.current.reload();
             }}
           >
             <a key="del">删除</a>
           </Popconfirm>
+          {record.menuType === "M" ? (
+            <TableDropdown
+              key="actionGroup"
+              onSelect={(key) => actionFn(key, record)}
+              menus={[
+                { key: "btn", name: "按钮管理" },
+                { key: "delete", name: "删除" },
+              ]}
+            ></TableDropdown>
+          ) : null}
         </Space>
       ),
     },
@@ -135,10 +197,29 @@ export default function Role() {
   return (
     <>
       <ProTable
-        rowKey="roleId"
+        rowKey="menuId"
         headerTitle={addBtn}
         columns={columns}
-        request={initReq}
+        request={async ({ menuName }) => {
+          try {
+            const data = await getList({ menuName });
+            if (!menuName) {
+              setMenuTree([{
+                menuId: "0",
+                menuName: "顶级",
+                children: data,
+              }]);
+            }
+            return {
+              success: true,
+              data,
+            };
+          } catch (error) {
+            return {
+              success: false,
+            };
+          }
+        }}
         actionRef={actionRef}
       />
 
@@ -147,7 +228,7 @@ export default function Role() {
         initialValues={formData}
         layoutType="ModalForm"
         visible={visible}
-        title={`${formData ? "修改" : "添加"}角色`}
+        title={`${formData ? "修改" : "添加"}菜单`}
         onVisibleChange={(v) => {
           if (!v) {
             dispatch({ type: "close" });
@@ -155,7 +236,7 @@ export default function Role() {
         }}
         onFinish={async (data) => {
           if (formData) {
-            data.roleId = formData.roleId;
+            data.menuId = formData.menuId;
             await editReq(data);
           } else {
             await addReq(data);
@@ -165,6 +246,8 @@ export default function Role() {
         }}
         columns={columns}
       />
+
+      <BtnModal btnState={btnState} setBtnState={setBtnState} />
     </>
   );
 }

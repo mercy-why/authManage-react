@@ -1,60 +1,34 @@
 import request from "@/request";
 import { message } from "antd";
+const PREFIX = "/menu";
 
-const PREFIX = "/role";
-
-const getList = (data) =>
+export const getList = (data) =>
   request({
-    url: `${PREFIX}/getRolePage`,
+    url: `${PREFIX}/getMenuTree`,
     data,
   });
 
-const add = (data) =>
+const addMenu = (data) =>
   request({
-    url: `${PREFIX}/addRole`,
+    url: `${PREFIX}/addMenu`,
     data,
   });
 
 const update = (data) =>
   request({
-    url: `${PREFIX}/updateRoleById`,
+    url: `${PREFIX}/updateMenuById`,
     data,
   });
 
 const del = (data) =>
   request({
-    url: `${PREFIX}/deleteRoleById`,
+    url: `${PREFIX}/deleteMenuById`,
     data,
   });
 
-export const initReq = async ({
-  current,
-  pageSize: size,
-  roleName,
-  roleCode,
-}) => {
-  try {
-    const { records, total } = await getList({
-      current,
-      size,
-      roleName,
-      roleCode,
-    });
-    return {
-      success: true,
-      data: records,
-      total,
-    };
-  } catch (error) {
-    return {
-      success: false,
-    };
-  }
-};
-
 export const addReq = async (data) => {
   try {
-    await add(data);
+    await addMenu(data);
     message.success("添加成功");
   } catch (error) {
     console.log(error);
