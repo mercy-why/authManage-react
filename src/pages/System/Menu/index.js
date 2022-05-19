@@ -1,10 +1,12 @@
 import ProTable, { TableDropdown } from "@ant-design/pro-table";
 import { getList, addReq, editReq, deleteReq } from "./services";
 import { Button, Space, Popconfirm } from "antd";
-import { useReducer, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { BetaSchemaForm } from "@ant-design/pro-form";
 import { defaultModalFormSetting } from "@/settings";
 import BtnModal from "./btnModal";
+import InterfaceModal from "./interfaceModal";
+import useModal from "@/hooks/useModal";
 
 const defaultRules = [
   {
@@ -20,43 +22,36 @@ const statusMap = {
     text: "菜单",
   },
 };
-export default function Role() {
-  const defaultData = {
-    visible: false,
-    formData: null,
-  };
-  const reducer = (_, { type, record }) => {
-    switch (type) {
-      case "add":
-        return { visible: true, formData: null };
-      case "edit":
-        return { visible: true, formData: record };
-      default:
-        return defaultData;
-    }
-  };
-  const [state, dispatch] = useReducer(reducer, defaultData);
+export default function Menu() {
+  const [modalState, addFn, editFn, clearFn] = useModal();
   const [menuTree, setMenuTree] = useState([]);
-  const { formData, visible } = state;
+  const { formData, visible } = modalState;
   const actionRef = useRef();
   const [btnState, setBtnState] = useState({
     visible: false,
     record: null,
+    menuId: null,
   });
-
-  const editFn = (record) => {
-    dispatch({
-      type: "edit",
-      record,
-    });
+  const [interfaceState, setInterfaceState] = useState({
+    visible: false,
+    record: null,
+    menuId: null,
+  });
+  const reloadFn = () => {
+    actionRef?.current.reload();
   };
-
   const actionFn = (key, record) => {
     if (key === "btn") {
-      console.log(record);
       setBtnState({
         visible: true,
         record: record.buttons,
+        menuId: record.menuId,
+      });
+    }else{
+      setInterfaceState({
+        visible: true,
+        record: record.resources,
+        menuId: record.menuId,
       });
     }
   };
@@ -71,7 +66,7 @@ export default function Role() {
         options: menuTree,
         allowClear: true,
         treeDefaultExpandAll: true,
-        defaultValue: '0',
+        defaultValue: "0",
         fieldNames: {
           label: "menuName",
           value: "menuId",
@@ -163,7 +158,7 @@ export default function Role() {
             cancelText="否"
             onConfirm={async () => {
               await deleteReq({ menuId: record.menuId });
-              actionRef?.current.reload();
+              reloadFn();
             }}
           >
             <a key="del">删除</a>
@@ -174,7 +169,7 @@ export default function Role() {
               onSelect={(key) => actionFn(key, record)}
               menus={[
                 { key: "btn", name: "按钮管理" },
-                { key: "delete", name: "删除" },
+                { key: "interface", name: "接口管理" },
               ]}
             ></TableDropdown>
           ) : null}
@@ -184,13 +179,7 @@ export default function Role() {
   ];
 
   const addBtn = (
-    <Button
-      key="primary"
-      type="primary"
-      onClick={() => {
-        dispatch({ type: "add" });
-      }}
-    >
+    <Button key="primary" type="primary" onClick={addFn}>
       添加
     </Button>
   );
@@ -204,11 +193,13 @@ export default function Role() {
           try {
             const data = await getList({ menuName });
             if (!menuName) {
-              setMenuTree([{
-                menuId: "0",
-                menuName: "顶级",
-                children: data,
-              }]);
+              setMenuTree([
+                {
+                  menuId: "0",
+                  menuName: "顶级",
+                  children: data,
+                },
+              ]);
             }
             return {
               success: true,
@@ -231,7 +222,7 @@ export default function Role() {
         title={`${formData ? "修改" : "添加"}菜单`}
         onVisibleChange={(v) => {
           if (!v) {
-            dispatch({ type: "close" });
+            clearFn();
           }
         }}
         onFinish={async (data) => {
@@ -241,13 +232,22 @@ export default function Role() {
           } else {
             await addReq(data);
           }
-          actionRef?.current.reload();
+          reloadFn();
           return true;
         }}
         columns={columns}
       />
 
-      <BtnModal btnState={btnState} setBtnState={setBtnState} />
+      <BtnModal
+        btnState={btnState}
+        setBtnState={setBtnState}
+        reloadFn={reloadFn}
+      />
+      <InterfaceModal
+        interfaceState={interfaceState}
+        setInterfaceState={setInterfaceState}
+        reloadFn={reloadFn}
+      />
     </>
   );
 }

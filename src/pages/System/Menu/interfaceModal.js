@@ -1,6 +1,6 @@
 import { Modal, Space, Popconfirm } from "antd";
 import { EditableProTable } from "@ant-design/pro-table";
-import { addMenuButtonReq, deleteBtnReq, editBtnReq } from "./services";
+import { addResourceReq, deleteResourceReq, editResourceReq } from "./services";
 import { useEffect, useState } from "react";
 const defaultRules = [
   {
@@ -8,41 +8,46 @@ const defaultRules = [
     message: "此项为必填项",
   },
 ];
-export default function BtnModal({ btnState, setBtnState, reloadFn }) {
-  const { visible, record = [], menuId } = btnState;
+export default function InterfaceModal({
+  interfaceState,
+  setInterfaceState,
+  reloadFn,
+}) {
+  const { visible, record = [], menuId } = interfaceState;
   const [dataSource, setDataSource] = useState([]);
   useEffect(() => {
     setDataSource(record);
   }, [record]);
   const onCancel = () => {
-    setBtnState({
+    setInterfaceState({
       visible: false,
       record: null,
     });
   };
 
   const deleteFn = async (id) => {
-    await deleteBtnReq({ buttonId: id });
-    setDataSource((data) => data.filter((x) => x.buttonId !== id));
+    await deleteResourceReq({ resourceId: id, menuId });
+    setDataSource((data) => data.filter((x) => x.resourceId !== id));
     reloadFn();
   };
   const columns = [
     {
-      title: "按钮名称",
-      dataIndex: "buttonName",
+      title: "接口名称",
+      dataIndex: "resourceName",
       formItemProps: {
         rules: defaultRules,
       },
     },
     {
-      title: "按钮编码",
-      dataIndex: "buttonCode",
+      title: "接口地址",
+      dataIndex: "requestUrl",
+      ellipsis: true,
       formItemProps: {
         rules: defaultRules,
       },
     },
     {
-      title: "按钮状态",
+      title: "接口状态",
       dataIndex: "statusFlag",
       valueEnum: {
         1: {
@@ -59,6 +64,36 @@ export default function BtnModal({ btnState, setBtnState, reloadFn }) {
       },
     },
     {
+      title: "需要登录",
+      dataIndex: "requiredLoginFlag",
+      valueEnum: {
+        Y: {
+          text: "是",
+        },
+        N: {
+          text: "否",
+        },
+      },
+      formItemProps: {
+        rules: defaultRules,
+      },
+    },
+    {
+      title: "需要权限验证",
+      dataIndex: "requiredPermissionFlag",
+      valueEnum: {
+        Y: {
+          text: "是",
+        },
+        N: {
+          text: "否",
+        },
+      },
+      formItemProps: {
+        rules: defaultRules,
+      },
+    },
+    {
       title: "操作",
       valueType: "option",
       render: (t, record, _, action) => (
@@ -66,7 +101,7 @@ export default function BtnModal({ btnState, setBtnState, reloadFn }) {
           <a
             key="editable"
             onClick={() => {
-              action?.startEditable?.(record.buttonId);
+              action?.startEditable?.(record.resourceId);
             }}
           >
             编辑
@@ -76,7 +111,7 @@ export default function BtnModal({ btnState, setBtnState, reloadFn }) {
             okText="是"
             cancelText="否"
             onConfirm={() => {
-              deleteFn(record.buttonId);
+              deleteFn(record.resourceId);
             }}
           >
             <a key="del">删除</a>
@@ -89,32 +124,40 @@ export default function BtnModal({ btnState, setBtnState, reloadFn }) {
     <>
       <Modal
         visible={visible}
-        title="菜单按钮管理"
-        width={800}
+        title="菜单接口管理"
+        width={1000}
         onCancel={onCancel}
         destroyOnClose
         footer={null}
       >
         <EditableProTable
-          rowKey="buttonId"
+          rowKey="resourceId"
           columns={columns}
           value={dataSource}
           editable={{
             onSave: async (rowKey, data) => {
               if (data.type === "add") {
-                const { buttonCode, buttonName, statusFlag } = data;
-                const res = await addMenuButtonReq({
-                  menuId,
-                  buttonCode,
-                  buttonName,
+                const {
+                  resourceName,
+                  requestUrl,
                   statusFlag,
+                  requiredLoginFlag,
+                  requiredPermissionFlag,
+                } = data;
+                const res = await addResourceReq({
+                  menuId,
+                  resourceName,
+                  requestUrl,
+                  statusFlag,
+                  requiredLoginFlag,
+                  requiredPermissionFlag,
                 });
                 setDataSource([...dataSource, res]);
               } else {
-                await editBtnReq(data);
+                await editResourceReq(data);
                 setDataSource((r) =>
                   r.map((x) => {
-                    if (x.buttonId === rowKey) {
+                    if (x.resourceId === rowKey) {
                       return data;
                     } else {
                       return x;
@@ -127,7 +170,7 @@ export default function BtnModal({ btnState, setBtnState, reloadFn }) {
           }}
           recordCreatorProps={{
             record: () => ({
-              buttonId: (Math.random() * 1000000).toFixed(0),
+              resourceId: (Math.random() * 1000000).toFixed(0),
               type: "add",
             }),
           }}

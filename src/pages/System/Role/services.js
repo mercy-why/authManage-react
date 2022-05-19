@@ -57,7 +57,7 @@ export const addReq = async (data) => {
     await add(data);
     message.success("添加成功");
   } catch (error) {
-    console.log(error);
+    return Promise.reject(error);
   }
 };
 
@@ -66,7 +66,7 @@ export const editReq = async (data) => {
     await update(data);
     message.success("修改成功");
   } catch (error) {
-    console.log(error);
+    return Promise.reject(error);
   }
 };
 
@@ -75,6 +75,6 @@ export const deleteReq = async (data) => {
     await del(data);
     message.success("删除成功");
   } catch (error) {
-    console.log(error);
+    return Promise.reject(error);
   }
 };

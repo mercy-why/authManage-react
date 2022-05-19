@@ -1,9 +1,11 @@
 import ProTable from "@ant-design/pro-table";
 import { initReq, addReq, editReq, deleteReq } from "./services";
 import { Button, Space, Popconfirm } from "antd";
-import { useReducer, useRef } from "react";
+import { useState, useRef } from "react";
 import { BetaSchemaForm } from "@ant-design/pro-form";
 import { defaultModalFormSetting } from "@/settings";
+import useModal from "@/hooks/useModal";
+import DistrubModal from "./distrubModal";
 
 const defaultRules = [
   {
@@ -13,28 +15,24 @@ const defaultRules = [
 ];
 
 export default function Role() {
-  const defaultData = {
-    visible: false,
-    formData: null,
-  };
-  const reducer = (_, { type, record }) => {
-    switch (type) {
-      case "add":
-        return { visible: true, formData: null };
-      case "edit":
-        return { visible: true, formData: record };
-      default:
-        return defaultData;
-    }
-  };
-  const [state, dispatch] = useReducer(reducer, defaultData);
-  const { formData, visible } = state;
+  const [modalState, addFn, editFn, clearFn] = useModal();
+  const { formData, visible } = modalState;
   const actionRef = useRef();
+  const [distrubState, setDisTrubState] = useState({
+    visible: false,
+    roleId: null,
+  });
 
-  const editFn = (record) => {
-    dispatch({
-      type: "edit",
-      record,
+  const distrubFn = (id) => {
+    setDisTrubState({
+      visible: true,
+      roleId: id,
+    });
+  };
+  const cancelFn = () => {
+    setDisTrubState({
+      visible: false,
+      roleId: null,
     });
   };
   const columns = [
@@ -116,19 +114,16 @@ export default function Role() {
           >
             <a key="del">删除</a>
           </Popconfirm>
+          <a key="disturb" onClick={() => distrubFn(record.roleId)}>
+            分配权限
+          </a>
         </Space>
       ),
     },
   ];
 
   const addBtn = (
-    <Button
-      key="primary"
-      type="primary"
-      onClick={() => {
-        dispatch({ type: "add" });
-      }}
-    >
+    <Button key="primary" type="primary" onClick={addFn}>
       添加
     </Button>
   );
@@ -150,7 +145,7 @@ export default function Role() {
         title={`${formData ? "修改" : "添加"}角色`}
         onVisibleChange={(v) => {
           if (!v) {
-            dispatch({ type: "close" });
+            clearFn();
           }
         }}
         onFinish={async (data) => {
@@ -165,6 +160,8 @@ export default function Role() {
         }}
         columns={columns}
       />
+
+      <DistrubModal distrubState={distrubState} cancelFn={cancelFn} />
     </>
   );
 }

@@ -17,8 +17,7 @@ export default function Layout() {
   };
 
   const loopMenuItem = (menus) =>
-    menus.map(({ menuName, menuRouter, icon, children, ...item }) => ({
-      ...item,
+    menus.map(({ menuName, menuRouter, icon, children }) => ({
       name: menuName,
       path: menuRouter,
       routes: children && loopMenuItem(children),
