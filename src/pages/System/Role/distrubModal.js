@@ -2,6 +2,7 @@ import { Modal, Tree, Tag, Space } from "antd";
 import { useState } from "react";
 import { getList } from "../Menu/services";
 import { useEffectOnce } from "@/hooks/utils";
+import { distrubReq } from "./services";
 
 const transformButtons = (buttons) => {
   if (!buttons) {
@@ -9,6 +10,8 @@ const transformButtons = (buttons) => {
   }
   return buttons.map((x) => ({
     key: x.buttonId,
+    buttonId: x.buttonId,
+    menuId: x.menuId,
     title: (
       <Space>
         {x.buttonName} <Tag color="success">按钮</Tag>
@@ -22,6 +25,7 @@ const transformResources = (resources) => {
   }
   return resources.map((x) => ({
     key: x.resourceId,
+    resourceId: x.resourceId,
     title: (
       <Space>
         {x.resourceName} <Tag color="processing">接口</Tag>
@@ -42,19 +46,42 @@ const loopTree = (tree) => {
     return {
       title: menuName,
       key: menuId,
+      menuId,
       children: transformChildren(children, buttons, resources),
     };
   });
 };
-
 export default function DistrubBtnModal({ distrubState, cancelFn }) {
   const { visible, roleId } = distrubState;
   const [checkKeys, setCheckKeys] = useState([]);
-  const onCheck = (checkedKeys) => {
+  const [result, setResult] = useState({});
+  const transformIds = (nodes) => {
+    if (!nodes) {
+      return {};
+    }
+    const obj = {
+      role: {
+        roleId,
+      },
+      menus: [],
+      menuButtons: [],
+      resources: [],
+    };
+    nodes.forEach((item) => {
+      item.menuId && obj.menus.push({ menuId: item.menuId });
+      item.buttonId &&
+        obj.menuButtons.push({ buttonId: item.buttonId, menuId: item.menuId });
+      item.resourceId && obj.resources.push({ resourceId: item.resourceId });
+    });
+    return obj;
+  };
+  const onCheck = (checkedKeys, e) => {
     setCheckKeys(checkedKeys);
+    setResult(transformIds(e.checkedNodes));
   };
 
   const [treeData, setTreeData] = useState([]);
+
   const initList = async () => {
     try {
       const res = await getList();
@@ -66,14 +93,23 @@ export default function DistrubBtnModal({ distrubState, cancelFn }) {
   useEffectOnce(() => {
     initList();
   });
+  const onCancel = () => {
+    cancelFn();
+    setCheckKeys([])
+    setResult({})
+  }
+  const saveFn = async () => {
+    await distrubReq(result);
+    onCancel();
+  };
   return (
     <Modal
       visible={visible}
       title="分配权限"
       width={600}
-      onCancel={cancelFn}
-      destroyOnClose
+      onCancel={onCancel}
       bodyStyle={{ height: "500px", overflow: "auto" }}
+      onOk={saveFn}
     >
       <Tree
         checkable
@@ -81,7 +117,6 @@ export default function DistrubBtnModal({ distrubState, cancelFn }) {
         checkedKeys={checkKeys}
         onCheck={onCheck}
         treeData={treeData}
-        re
       />
     </Modal>
   );

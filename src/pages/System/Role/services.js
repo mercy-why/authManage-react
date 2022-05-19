@@ -27,6 +27,12 @@ const del = (data) =>
     data,
   });
 
+const assignPermissions = (data) =>
+  request({
+    url: `${PREFIX}/assignPermissions`,
+    data,
+  });
+
 export const initReq = async ({
   current,
   pageSize: size,
@@ -74,6 +80,15 @@ export const deleteReq = async (data) => {
   try {
     await del(data);
     message.success("删除成功");
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+export const distrubReq = async (data) => {
+  try {
+    await assignPermissions(data);
+    message.success("分配成功");
   } catch (error) {
     return Promise.reject(error);
   }
