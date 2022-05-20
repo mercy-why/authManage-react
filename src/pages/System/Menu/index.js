@@ -1,13 +1,13 @@
 import ProTable, { TableDropdown } from "@ant-design/pro-table";
 import { getList, addReq, editReq, deleteReq } from "./services";
-import { Button, Space, Popconfirm } from "antd";
-import { useRef, useState } from "react";
+import { Button, Space, Popconfirm, Radio, Select } from "antd";
+import { useRef, useState, createElement } from "react";
 import { BetaSchemaForm } from "@ant-design/pro-form";
 import { defaultModalFormSetting } from "@/settings";
 import BtnModal from "./btnModal";
 import InterfaceModal from "./interfaceModal";
 import useModal from "@/hooks/useModal";
-
+import Icon, * as Icons from "@ant-design/icons";
 const defaultRules = [
   {
     required: true,
@@ -47,7 +47,7 @@ export default function Menu() {
         record: record.buttons,
         menuId: record.menuId,
       });
-    }else{
+    } else {
       setInterfaceState({
         visible: true,
         record: record.resources,
@@ -110,6 +110,26 @@ export default function Menu() {
     {
       title: "图标",
       dataIndex: "menuIcon",
+      valueType: "select",
+      fieldProps: {
+        virtual: false,
+        options: Object.keys(Icons).map((item, index) => {
+          if (
+            typeof Icons[item] === "object" &&
+            item !== "default" &&
+            item !== "IconProvider" &&
+            item.endsWith("Outlined")
+          ) {
+            return {
+              value: item,
+              label: createElement(Icons[item], {}),
+            };
+          } else {
+            return null;
+          }
+        }),
+        dropdownClassName: 'ico-x'
+      },
       formItemProps: {
         rules: defaultRules,
       },

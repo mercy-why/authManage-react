@@ -44,6 +44,7 @@
     "webpackbar": "^5.0.2"
   },
   "dependencies": {
+    "@ant-design/icons": "^4.7.0",
     "@ant-design/pro-form": "^1.68.0",
     "@ant-design/pro-layout": "^6.38.2",
     "@ant-design/pro-table": "^2.74.4",

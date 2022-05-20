@@ -1,8 +1,8 @@
 import { Modal, Tree, Tag, Space } from "antd";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getList } from "../Menu/services";
 import { useEffectOnce } from "@/hooks/utils";
-import { distrubReq } from "./services";
+import { distrubReq, getPermissionsByRoleId } from "./services";
 
 const transformButtons = (buttons) => {
   if (!buttons) {
@@ -90,14 +90,37 @@ export default function DistrubBtnModal({ distrubState, cancelFn }) {
       console.log(error);
     }
   };
+
+  const initCheckList = async (roleId) => {
+    try {
+      const res = await getPermissionsByRoleId({ roleId });
+      const buttonIds = res.buttonIds || "";
+      const menuIds = res.menuIds || "";
+      const resourceIds = res.resourceIds || "";
+      const keys = [
+        ...buttonIds.split(","),
+        ...menuIds.split(","),
+        ...resourceIds.split(","),
+      ];
+      setCheckKeys(keys);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffectOnce(() => {
     initList();
   });
+
+  useEffect(() => {
+    if (roleId) {
+      initCheckList(roleId);
+    }
+  }, [roleId]);
   const onCancel = () => {
     cancelFn();
-    setCheckKeys([])
-    setResult({})
-  }
+    setCheckKeys([]);
+    setResult({});
+  };
   const saveFn = async () => {
     await distrubReq(result);
     onCancel();
@@ -112,6 +135,7 @@ export default function DistrubBtnModal({ distrubState, cancelFn }) {
       onOk={saveFn}
     >
       <Tree
+        checkStrictly
         checkable
         defaultExpandAll
         checkedKeys={checkKeys}

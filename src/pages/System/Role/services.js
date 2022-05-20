@@ -33,6 +33,12 @@ const assignPermissions = (data) =>
     data,
   });
 
+export const getPermissionsByRoleId = (data) =>
+  request({
+    url: `${PREFIX}/getPermissionsByRoleId`,
+    data,
+  });
+
 export const initReq = async ({
   current,
   pageSize: size,
