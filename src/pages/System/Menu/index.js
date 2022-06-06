@@ -1,13 +1,13 @@
 import ProTable, { TableDropdown } from "@ant-design/pro-table";
 import { getList, addReq, editReq, deleteReq } from "./services";
-import { Button, Space, Popconfirm, Radio, Select } from "antd";
+import { Button, Space, Popconfirm } from "antd";
 import { useRef, useState, createElement } from "react";
 import { BetaSchemaForm } from "@ant-design/pro-form";
 import { defaultModalFormSetting } from "@/settings";
 import BtnModal from "./btnModal";
 import InterfaceModal from "./interfaceModal";
 import useModal from "@/hooks/useModal";
-import Icon, * as Icons from "@ant-design/icons";
+import * as Icons from "@ant-design/icons";
 const defaultRules = [
   {
     required: true,
@@ -128,7 +128,7 @@ export default function Menu() {
             return null;
           }
         }),
-        dropdownClassName: 'ico-x'
+        dropdownClassName: "ico-x",
       },
       formItemProps: {
         rules: defaultRules,

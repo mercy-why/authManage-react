@@ -42,6 +42,7 @@ const transformChildren = (children, buttons, resources) => {
   }
 };
 const loopTree = (tree) => {
+  console.log(tree);
   return tree.map(({ menuId, menuName, children, buttons, resources }) => {
     return {
       title: menuName,
@@ -54,7 +55,7 @@ const loopTree = (tree) => {
 export default function DistrubBtnModal({ distrubState, cancelFn }) {
   const { visible, roleId } = distrubState;
   const [checkKeys, setCheckKeys] = useState([]);
-  const [result, setResult] = useState({});
+  const [result, setResult] = useState(null);
   const transformIds = (nodes) => {
     if (!nodes) {
       return {};
@@ -94,13 +95,11 @@ export default function DistrubBtnModal({ distrubState, cancelFn }) {
   const initCheckList = async (roleId) => {
     try {
       const res = await getPermissionsByRoleId({ roleId });
-      const buttonIds = res.buttonIds || "";
-      const menuIds = res.menuIds || "";
-      const resourceIds = res.resourceIds || "";
+      const { buttonIds, menuIds, resourceIds } = res;
       const keys = [
-        ...buttonIds.split(","),
-        ...menuIds.split(","),
-        ...resourceIds.split(","),
+        ...(buttonIds?.split(",") || []),
+        ...(menuIds?.split(",") || []),
+        ...(resourceIds?.split(",") || []),
       ];
       setCheckKeys(keys);
     } catch (error) {
@@ -119,9 +118,13 @@ export default function DistrubBtnModal({ distrubState, cancelFn }) {
   const onCancel = () => {
     cancelFn();
     setCheckKeys([]);
-    setResult({});
+    setResult(null);
   };
   const saveFn = async () => {
+    if (!result) {
+      onCancel();
+      return;
+    }
     await distrubReq(result);
     onCancel();
   };

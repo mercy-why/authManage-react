@@ -126,6 +126,7 @@ export default function InterfaceModal({
         visible={visible}
         title="菜单接口管理"
         width={1000}
+        bodyStyle={{ maxHeight: 600, overflow: 'auto' }}
         onCancel={onCancel}
         destroyOnClose
         footer={null}

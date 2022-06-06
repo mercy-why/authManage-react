@@ -2,7 +2,7 @@ import request from "@/request";
 import { message } from "antd";
 const PREFIX = "/menu";
 
-export const getList = (data) =>
+export const getList = (data = {}) =>
   request({
     url: `${PREFIX}/getMenuTree`,
     data,

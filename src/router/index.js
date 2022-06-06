@@ -4,6 +4,7 @@ import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import Role from "@/pages/System/Role";
 import Menu from "@/pages/System/Menu";
+import User from "@/pages/System/User";
 
 export default () => {
   return (
@@ -14,6 +15,7 @@ export default () => {
           <Route path="system">
             <Route path="role" element={<Role />}></Route>
             <Route path="menu" element={<Menu />}></Route>
+            <Route path="user" element={<User />}></Route>
           </Route>
         </Route>
         <Route path="/login" element={<Login />}></Route>
