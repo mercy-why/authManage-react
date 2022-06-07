@@ -1,10 +1,11 @@
-import { useState, createElement } from "react";
+import { useState, createElement, useRef, useEffect } from "react";
 import ProLayout from "@ant-design/pro-layout";
-import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
+import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
 import { getLoginUserInfoReq } from "./services";
-import { Avatar, Space } from "antd";
+import { Avatar, Space, Select } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import * as Icons from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 
 export default function Layout() {
   const defaultProps = {
@@ -17,6 +18,9 @@ export default function Layout() {
     title: "权限管理系统",
   };
   const navigate = useNavigate();
+  const selectRef = useRef();
+  const [searchOptions, setOptions] = useState([]);
+  const [searchVisible, setSearchVisible] = useState(false);
   const uniqueList = (arr) => {
     if (arr?.length === 0) {
       return [];
@@ -50,13 +54,14 @@ export default function Layout() {
 
   const loopMenuItem = (menus) => {
     const arr = [];
+    const options = [];
     menus.forEach((item, i, array) => {
-      const { menuId, menuName, menuRouter, icon, menuParentId } = item;
+      const { menuId, menuName, menuRouter, menuIcon, menuParentId } = item;
       const newItem = {
         key: menuId,
         name: menuName,
         path: menuRouter,
-        icon: icon && createElement(Icons[icon], {}),
+        icon: Icons[menuIcon] && createElement(Icons[menuIcon], {}),
         routes: [],
       };
       if (menuParentId === "0") {
@@ -66,18 +71,57 @@ export default function Layout() {
               key: x.menuId,
               name: x.menuName,
               path: x.menuRouter,
-              icon: x.icon && createElement(Icons[x.icon], {}),
+              icon: Icons[x.menuIcon] && createElement(Icons[x.menuIcon], {}),
+            });
+            options.push({
+              key: x.menuId,
+              value: x.menuRouter,
+              label: menuName + " > " + x.menuName,
             });
           }
         });
         arr.push(newItem);
       }
     });
+    setOptions(options);
     return arr;
   };
+
+  const onSelect = (value) => {
+    setSearchVisible(false);
+    navigate(value);
+  };
+  const focusSearch = () => {
+    setSearchVisible(true);
+  };
+  useEffect(() => {
+    if (searchVisible) {
+      selectRef.current?.focus();
+    }
+  }, [searchVisible]);
+
   const renderHeader = () => {
     return (
       <Space>
+        <div className="tools-x">
+          <SearchOutlined onClick={focusSearch} />
+          {searchVisible ? (
+            <Select
+              ref={selectRef}
+              showSearch
+              bordered={false}
+              showArrow={false}
+              placeholder="Search"
+              options={searchOptions}
+              optionFilterProp="label"
+              style={{ minWidth: 180, marginLeft: 10 }}
+              onSelect={onSelect}
+              value={null}
+              onBlur={() => setSearchVisible(false)}
+            ></Select>
+          ) : null}
+        </div>
+
         <Avatar shape="square" size="small" icon={<UserOutlined />} />
         <span>{userInfo?.nickName}</span>
       </Space>
@@ -92,10 +136,14 @@ export default function Layout() {
       location={location}
       menu={{
         request: async () => {
-          const data = await getLoginUserInfoReq();
-          const { menus } = uniqueList(data.permissions);
-          setUserInfo(data);
-          return loopMenuItem(menus);
+          try {
+            const data = await getLoginUserInfoReq();
+            const { menus } = uniqueList(data.permissions);
+            setUserInfo(data);
+            return loopMenuItem(menus);
+          } catch (error) {
+            return null;
+          }
         },
       }}
       rightContentRender={renderHeader}

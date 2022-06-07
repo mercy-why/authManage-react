@@ -11,8 +11,10 @@ const service = axios.create({
 service.interceptors.request.use(
   (config) => {
     if (!config.noAuth) {
-      const Authorization = localStorage.getItem("Authorization") || "";
-      config.headers.Authorization = Authorization;
+      const Authorization = localStorage.getItem("Authorization");
+      if (Authorization) {
+        config.headers.Authorization = Authorization;
+      }
     }
     return config;
   },

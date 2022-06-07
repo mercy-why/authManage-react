@@ -42,7 +42,6 @@ const transformChildren = (children, buttons, resources) => {
   }
 };
 const loopTree = (tree) => {
-  console.log(tree);
   return tree.map(({ menuId, menuName, children, buttons, resources }) => {
     return {
       title: menuName,
