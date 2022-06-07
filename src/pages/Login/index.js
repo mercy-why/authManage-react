@@ -67,7 +67,7 @@ export default function Login() {
             size: "large",
             prefix: <LockOutlined />,
           }}
-          placeholder={"密码: ant.design"}
+          placeholder={"密码: 123456"}
           rules={[
             {
               required: true,

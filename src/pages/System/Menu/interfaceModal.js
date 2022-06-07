@@ -17,7 +17,7 @@ export default function InterfaceModal({
   const [dataSource, setDataSource] = useState([]);
   useEffect(() => {
     setDataSource(record);
-  }, [record]);
+  }, [interfaceState]);
   const onCancel = () => {
     setInterfaceState({
       visible: false,

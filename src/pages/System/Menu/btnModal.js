@@ -13,7 +13,7 @@ export default function BtnModal({ btnState, setBtnState, reloadFn }) {
   const [dataSource, setDataSource] = useState([]);
   useEffect(() => {
     setDataSource(record);
-  }, [record]);
+  }, [btnState]);
   const onCancel = () => {
     setBtnState({
       visible: false,

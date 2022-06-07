@@ -114,7 +114,7 @@ export default function Layout() {
               placeholder="Search"
               options={searchOptions}
               optionFilterProp="label"
-              style={{ minWidth: 180, marginLeft: 10 }}
+              style={{ minWidth: 180, marginLeft: 10 , borderBottom: '1px solid #d9d9d9'}}
               onSelect={onSelect}
               value={null}
               onBlur={() => setSearchVisible(false)}
