@@ -49,7 +49,7 @@ export default function BtnModal({ btnState, setBtnState, reloadFn }) {
           text: "正常",
           status: "Success",
         },
-        0: {
+        2: {
           text: "停用",
           status: "Error",
         },
@@ -129,6 +129,7 @@ export default function BtnModal({ btnState, setBtnState, reloadFn }) {
             record: () => ({
               buttonId: (Math.random() * 1000000).toFixed(0),
               type: "add",
+              statusFlag: '1'
             }),
           }}
         />

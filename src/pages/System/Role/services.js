@@ -40,26 +40,27 @@ export const getPermissionsByRoleId = (data) =>
   });
 
 export const initReq = async ({
-  current,
-  pageSize: size,
+  current: pageNo,
+  pageSize,
   roleName,
   roleCode,
 }) => {
   try {
-    const { records, total } = await getList({
-      current,
-      size,
+    const { list, totalCount } = await getList({
+      pageNo,
+      pageSize,
       roleName,
       roleCode,
     });
     return {
       success: true,
-      data: records,
-      total,
+      data: list,
+      total: totalCount,
     };
   } catch (error) {
     return {
       success: false,
+      data: [],
     };
   }
 };

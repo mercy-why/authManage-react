@@ -54,7 +54,7 @@ export default function InterfaceModal({
           text: "正常",
           status: "Success",
         },
-        0: {
+        2: {
           text: "停用",
           status: "Error",
         },

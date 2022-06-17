@@ -6,7 +6,7 @@ import { BetaSchemaForm } from "@ant-design/pro-form";
 import { defaultModalFormSetting } from "@/settings";
 import useModal from "@/hooks/useModal";
 import DistrubModal from "./distrubModal";
-
+import Access from "@/components/Access";
 const defaultRules = [
   {
     required: true,
@@ -68,7 +68,7 @@ export default function Role() {
           text: "正常",
           status: "Success",
         },
-        0: {
+        2: {
           text: "禁用",
           status: "Error",
         },
@@ -98,34 +98,43 @@ export default function Role() {
       title: "操作",
       hideInSearch: true,
       hideInForm: true,
-      render: (t, record) => (
-        <Space>
-          <a key="edit" onClick={() => editFn(record)}>
-            修改
-          </a>
-          <Popconfirm
-            title="是否确定删除此条？"
-            okText="是"
-            cancelText="否"
-            onConfirm={async () => {
-              await deleteReq({ roleId: record.roleId });
-              actionRef?.current.reload();
-            }}
-          >
-            <a key="del">删除</a>
-          </Popconfirm>
-          <a key="disturb" onClick={() => distrubFn(record.roleId)}>
-            分配权限
-          </a>
-        </Space>
-      ),
+      render: (t, record) =>
+        record.roleCode === "admin" ? null : (
+          <Space>
+            <Access buttonCode="menu-edit">
+              <a key="edit" onClick={() => editFn(record)}>
+                修改
+              </a>
+            </Access>
+            <Access buttonCode="menu-delete">
+              <Popconfirm
+                title="是否确定删除此条？"
+                okText="是"
+                cancelText="否"
+                onConfirm={async () => {
+                  await deleteReq({ roleId: record.roleId });
+                  actionRef?.current.reload();
+                }}
+              >
+                <a key="del">删除</a>
+              </Popconfirm>
+            </Access>
+            <Access buttonCode="menu-disturb">
+              <a key="disturb" onClick={() => distrubFn(record.roleId)}>
+                分配权限
+              </a>
+            </Access>
+          </Space>
+        ),
     },
   ];
 
   const addBtn = (
-    <Button key="primary" type="primary" onClick={addFn}>
-      添加
-    </Button>
+    <Access buttonCode="menu-add">
+      <Button key="primary" type="primary" onClick={addFn}>
+        添加
+      </Button>
+    </Access>
   );
   return (
     <>
@@ -135,6 +144,7 @@ export default function Role() {
         columns={columns}
         request={initReq}
         actionRef={actionRef}
+        revalidateOnFocus={false}
       />
 
       <BetaSchemaForm

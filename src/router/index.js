@@ -1,24 +1,29 @@
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "@/layout";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import Role from "@/pages/System/Role";
 import Menu from "@/pages/System/Menu";
 import User from "@/pages/System/User";
+import Organization from "@/pages/System/Organization";
+import NotFound from "@/pages/Others/notFound";
 
 export default () => {
   return (
     <HashRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
+          <Route path="" element={<Navigate to="home" />} />
+          <Route element={<Home />} index path="home" />
           <Route path="system">
             <Route path="role" element={<Role />}></Route>
             <Route path="menu" element={<Menu />}></Route>
             <Route path="user" element={<User />}></Route>
+            <Route path="organization" element={<Organization />}></Route>
           </Route>
         </Route>
         <Route path="/login" element={<Login />}></Route>
+        <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </HashRouter>
   );

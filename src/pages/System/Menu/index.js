@@ -1,13 +1,16 @@
 import ProTable, { TableDropdown } from "@ant-design/pro-table";
 import { getList, addReq, editReq, deleteReq } from "./services";
 import { Button, Space, Popconfirm } from "antd";
-import { useRef, useState, createElement } from "react";
+import { useRef, useState, createElement, useContext } from "react";
 import { BetaSchemaForm } from "@ant-design/pro-form";
 import { defaultModalFormSetting } from "@/settings";
 import BtnModal from "./btnModal";
 import InterfaceModal from "./interfaceModal";
 import useModal from "@/hooks/useModal";
 import * as Icons from "@ant-design/icons";
+import Access from "@/components/Access";
+import { UserContext } from "@/layout";
+
 const defaultRules = [
   {
     required: true,
@@ -26,6 +29,8 @@ export default function Menu() {
   const [modalState, addFn, editFn, clearFn] = useModal();
   const [menuTree, setMenuTree] = useState([]);
   const { formData, visible } = modalState;
+  const { user } = useContext(UserContext);
+  const { hasAccess } = user;
   const actionRef = useRef();
   const [btnState, setBtnState] = useState({
     visible: false,
@@ -153,7 +158,7 @@ export default function Menu() {
           text: "正常",
           status: "Success",
         },
-        0: {
+        2: {
           text: "停用",
           status: "Error",
         },
@@ -169,27 +174,31 @@ export default function Menu() {
       hideInForm: true,
       render: (t, record) => (
         <Space>
-          <a key="edit" onClick={() => editFn(record)}>
-            修改
-          </a>
-          <Popconfirm
-            title="是否确定删除此条？"
-            okText="是"
-            cancelText="否"
-            onConfirm={async () => {
-              await deleteReq({ menuId: record.menuId });
-              reloadFn();
-            }}
-          >
-            <a key="del">删除</a>
-          </Popconfirm>
+          <Access menuButton="role-edit">
+            <a key="edit" onClick={() => editFn(record)}>
+              修改
+            </a>
+          </Access>
+          <Access menuButton="role-delete">
+            <Popconfirm
+              title="是否确定删除此条？"
+              okText="是"
+              cancelText="否"
+              onConfirm={async () => {
+                await deleteReq({ menuId: record.menuId });
+                reloadFn();
+              }}
+            >
+              <a key="del">删除</a>
+            </Popconfirm>
+          </Access>
           {record.menuType === "M" ? (
             <TableDropdown
               key="actionGroup"
               onSelect={(key) => actionFn(key, record)}
               menus={[
-                { key: "btn", name: "按钮管理" },
-                { key: "interface", name: "接口管理" },
+               hasAccess('menu-btn') && { key: "btn", name: "按钮管理" },
+               hasAccess('menu-resource') && { key: "interface", name: "接口管理" },
               ]}
             ></TableDropdown>
           ) : null}
@@ -199,16 +208,20 @@ export default function Menu() {
   ];
 
   const addBtn = (
-    <Button key="primary" type="primary" onClick={addFn}>
-      添加
-    </Button>
+    <Access menuButton="role-add">
+      <Button key="primary" type="primary" onClick={addFn}>
+        添加
+      </Button>
+    </Access>
   );
   return (
     <>
       <ProTable
         rowKey="menuId"
         headerTitle={addBtn}
+        search={false}
         columns={columns}
+        revalidateOnFocus={false}
         request={async ({ menuName }) => {
           try {
             const data = await getList({ menuName });

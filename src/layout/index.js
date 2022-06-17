@@ -1,11 +1,18 @@
-import { useState, createElement, useRef, useEffect } from "react";
+import {
+  useState,
+  createElement,
+  useRef,
+  useEffect,
+  createContext,
+} from "react";
 import ProLayout from "@ant-design/pro-layout";
 import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
-import { getLoginUserInfoReq } from "./services";
-import { Avatar, Space, Select } from "antd";
+import { getLoginUserInfoReq, logoutReq } from "./services";
+import { Avatar, Space, Select, Menu, Dropdown } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import * as Icons from "@ant-design/icons";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, CaretDownOutlined } from "@ant-design/icons";
+export const UserContext = createContext({});
 
 export default function Layout() {
   const defaultProps = {
@@ -21,6 +28,7 @@ export default function Layout() {
   const selectRef = useRef();
   const [searchOptions, setOptions] = useState([]);
   const [searchVisible, setSearchVisible] = useState(false);
+  const [user, setUser] = useState({});
   const uniqueList = (arr) => {
     if (arr?.length === 0) {
       return [];
@@ -28,6 +36,7 @@ export default function Layout() {
     const uniButtonObj = {};
     const uniMenusObj = {};
     const uniResourcesObj = {};
+    const roles = [];
     for (const item of arr) {
       for (const value of item.menuButtons) {
         if (!uniButtonObj[value.buttonId]) {
@@ -40,15 +49,17 @@ export default function Layout() {
         }
       }
       for (const value of item.resources) {
-        if (!uniResourcesObj[value.roleId]) {
-          uniResourcesObj[value.roleId] = value;
+        if (!uniResourcesObj[value.resourceId]) {
+          uniResourcesObj[value.resourceId] = value;
         }
       }
+      roles.push(item.role);
     }
     return {
       buttons: Object.values(uniButtonObj),
       menus: Object.values(uniMenusObj),
       resources: Object.values(uniResourcesObj),
+      roles,
     };
   };
 
@@ -100,6 +111,26 @@ export default function Layout() {
     }
   }, [searchVisible]);
 
+  const menuFn = ({ key }) => {
+    if (key === "logout") {
+      logoutReq();
+      setUser(null);
+      navigate("login");
+    }
+  };
+
+  const menuDom = (
+    <Menu
+      onClick={menuFn}
+      items={[
+        {
+          key: "logout",
+          label: "退出登录",
+        },
+      ]}
+    />
+  );
+
   const renderHeader = () => {
     return (
       <Space>
@@ -114,42 +145,63 @@ export default function Layout() {
               placeholder="Search"
               options={searchOptions}
               optionFilterProp="label"
-              style={{ minWidth: 180, marginLeft: 10 , borderBottom: '1px solid #d9d9d9'}}
+              style={{
+                minWidth: 180,
+                marginLeft: 10,
+                borderBottom: "1px solid #d9d9d9",
+              }}
               onSelect={onSelect}
               value={null}
               onBlur={() => setSearchVisible(false)}
             ></Select>
           ) : null}
         </div>
-
-        <Avatar shape="square" size="small" icon={<UserOutlined />} />
-        <span>{userInfo?.nickName}</span>
+        <Dropdown overlay={menuDom}>
+          <Space className="cur">
+            <Avatar shape="square" size="small" icon={<UserOutlined />} />
+            <span>{user?.nickName}</span>
+            <CaretDownOutlined className="dp-icon" />
+          </Space>
+        </Dropdown>
       </Space>
     );
   };
 
-  const [userInfo, setUserInfo] = useState(null);
   const location = useLocation();
   return (
-    <ProLayout
-      {...defaultProps}
-      location={location}
-      menu={{
-        request: async () => {
-          try {
-            const data = await getLoginUserInfoReq();
-            const { menus } = uniqueList(data.permissions);
-            setUserInfo(data);
-            return loopMenuItem(menus);
-          } catch (error) {
-            return null;
-          }
-        },
-      }}
-      rightContentRender={renderHeader}
-      menuItemRender={(item, dom) => <Link to={item.path}>{dom}</Link>}
-    >
-      <Outlet />
-    </ProLayout>
+    <UserContext.Provider value={{ user, setUser }}>
+      <ProLayout
+        {...defaultProps}
+        location={location}
+        menu={{
+          request: async () => {
+            try {
+              const data = await getLoginUserInfoReq();
+              const { menus, buttons, resources, roles } = uniqueList(
+                data.permissions
+              );
+              console.log(roles);
+              setUser({
+                menus,
+                buttons,
+                resources,
+                nickName: data.nickName,
+                hasAccess: (code) => {
+                  const isAdmin = roles.some((x) => x.roleCode === "admin");
+                  return isAdmin || buttons?.some((x) => x.buttonCode === code);
+                },
+              });
+              return loopMenuItem(menus);
+            } catch (error) {
+              return null;
+            }
+          },
+        }}
+        rightContentRender={renderHeader}
+        menuItemRender={(item, dom) => <Link to={item.path}>{dom}</Link>}
+      >
+        <Outlet />
+      </ProLayout>
+    </UserContext.Provider>
   );
 }

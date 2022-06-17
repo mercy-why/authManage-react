@@ -6,3 +6,10 @@ export const getLoginUserInfoReq = async (data) => {
     data,
   });
 };
+
+export const logoutReq = async (data) => {
+  return request({
+    url: "/user/logout",
+    data,
+  });
+};

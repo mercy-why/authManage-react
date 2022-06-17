@@ -46,6 +46,10 @@ export default function Login() {
         onFinish={loginFn}
         backgroundImageUrl="https://gw.alipayobjects.com/zos/rmsportal/FfdJeJRQWjEeGTpqgBKj.png"
         logo="https://github.githubassets.com/images/modules/logos_page/Octocat.png"
+        initialValues={{
+          account: 'admin',
+          password: '123456'
+        }}
       >
         <ProFormText
           name="account"

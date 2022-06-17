@@ -18,7 +18,7 @@ const config = merge(common, {
       logging: "warn", // warn以上的信息，才会打印
       overlay: true, // 当出现编译错误或警告时，在浏览器中显示全屏覆盖
     },
-    proxy
+    proxy,
   },
   plugins: [
     new ReactRefreshWebpackPlugin(),

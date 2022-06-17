@@ -1,7 +1,5 @@
+import bg from "@/assets/images/bg.jpeg";
+
 export default function Home() {
-  return (
-    <div>
-      首页
-    </div>
-  );
+  return <img src={bg} width="100%" />;
 }
