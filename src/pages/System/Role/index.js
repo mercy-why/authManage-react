@@ -101,12 +101,12 @@ export default function Role() {
       render: (t, record) =>
         record.roleCode === "admin" ? null : (
           <Space>
-            <Access buttonCode="menu-edit">
+            <Access buttonCode="role-edit">
               <a key="edit" onClick={() => editFn(record)}>
                 修改
               </a>
             </Access>
-            <Access buttonCode="menu-delete">
+            <Access buttonCode="role-delete">
               <Popconfirm
                 title="是否确定删除此条？"
                 okText="是"
@@ -119,7 +119,7 @@ export default function Role() {
                 <a key="del">删除</a>
               </Popconfirm>
             </Access>
-            <Access buttonCode="menu-disturb">
+            <Access buttonCode="role-disturb">
               <a key="disturb" onClick={() => distrubFn(record.roleId)}>
                 分配权限
               </a>
@@ -130,7 +130,7 @@ export default function Role() {
   ];
 
   const addBtn = (
-    <Access buttonCode="menu-add">
+    <Access buttonCode="role-add">
       <Button key="primary" type="primary" onClick={addFn}>
         添加
       </Button>
