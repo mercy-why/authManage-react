@@ -29,7 +29,10 @@ service.interceptors.response.use(
   },
   (error) => {
     const { status } = error?.response || {};
-    const msg = error?.response.data || codeMessage[status];
+    let msg = error?.response.data;
+    if (typeof msg === 'object') {
+      msg = codeMessage[status];
+    }
     message.error(msg || "请求错误");
     if (status === 401) {
       localStorage.clear();

@@ -71,7 +71,6 @@ export default function Menu() {
         options: menuTree,
         allowClear: true,
         treeDefaultExpandAll: true,
-        defaultValue: "0",
         fieldNames: {
           label: "menuName",
           value: "menuId",
@@ -250,7 +249,7 @@ export default function Menu() {
 
       <BetaSchemaForm
         {...defaultModalFormSetting}
-        initialValues={formData}
+        initialValues={formData || { menuParentId: "0" }}
         layoutType="ModalForm"
         visible={visible}
         title={`${formData ? "修改" : "添加"}菜单`}
@@ -262,7 +261,7 @@ export default function Menu() {
         onFinish={async (data) => {
           if (formData) {
             data.menuId = formData.menuId;
-            data.menuIcon = data.menuIcon || ''
+            data.menuIcon = data.menuIcon || "";
             await editReq(data);
           } else {
             await addReq(data);

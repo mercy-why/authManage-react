@@ -37,6 +37,15 @@ export default function Role() {
   };
   const columns = [
     {
+      title: "序号",
+      dataIndex: "roleSort",
+      valueType: "digit",
+      formItemProps: {
+        rules: defaultRules,
+      },
+      search: false,
+    },
+    {
       title: "角色名称",
       dataIndex: "roleName",
       formItemProps: {
@@ -49,15 +58,6 @@ export default function Role() {
       formItemProps: {
         rules: defaultRules,
       },
-    },
-    {
-      title: "显示顺序",
-      dataIndex: "roleSort",
-      valueType: "digit",
-      formItemProps: {
-        rules: defaultRules,
-      },
-      search: false,
     },
     {
       title: "状态",
