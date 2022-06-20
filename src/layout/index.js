@@ -180,7 +180,6 @@ export default function Layout() {
               const { menus, buttons, resources, roles } = uniqueList(
                 data.permissions
               );
-              console.log(roles);
               setUser({
                 menus,
                 buttons,

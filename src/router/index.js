@@ -7,6 +7,7 @@ import Menu from "@/pages/System/Menu";
 import User from "@/pages/System/User";
 import Organization from "@/pages/System/Organization";
 import NotFound from "@/pages/Others/notFound";
+import Job from "@/pages/System/Job";
 
 export default () => {
   return (
@@ -20,6 +21,7 @@ export default () => {
             <Route path="menu" element={<Menu />}></Route>
             <Route path="user" element={<User />}></Route>
             <Route path="organization" element={<Organization />}></Route>
+            <Route path="job" element={<Job />}></Route>
           </Route>
         </Route>
         <Route path="/login" element={<Login />}></Route>
