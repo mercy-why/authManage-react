@@ -40,6 +40,7 @@ export default function Organization() {
       rowKey="orgId"
       search={false}
       columns={columns}
+      pagination={false}
       revalidateOnFocus={false}
       request={async () => {
         const data = await getOrgTreeReq();

@@ -77,6 +77,9 @@ export default function Menu() {
           value: "menuId",
         },
       },
+      formItemProps: {
+        rules: defaultRules,
+      },
     },
     {
       title: "菜单名称",
@@ -107,9 +110,6 @@ export default function Menu() {
     {
       title: "组件路径",
       dataIndex: "menuComponent",
-      formItemProps: {
-        rules: defaultRules,
-      },
       search: false,
     },
     {
@@ -134,9 +134,6 @@ export default function Menu() {
           }
         }),
         dropdownClassName: "ico-x",
-      },
-      formItemProps: {
-        rules: defaultRules,
       },
       search: false,
     },
@@ -197,8 +194,11 @@ export default function Menu() {
               key="actionGroup"
               onSelect={(key) => actionFn(key, record)}
               menus={[
-               hasAccess('menu-btn') && { key: "btn", name: "按钮管理" },
-               hasAccess('menu-resource') && { key: "interface", name: "接口管理" },
+                hasAccess("menu-btn") && { key: "btn", name: "按钮管理" },
+                hasAccess("menu-resource") && {
+                  key: "interface",
+                  name: "接口管理",
+                },
               ]}
             ></TableDropdown>
           ) : null}
@@ -222,6 +222,7 @@ export default function Menu() {
         search={false}
         columns={columns}
         revalidateOnFocus={false}
+        pagination={false}
         request={async ({ menuName }) => {
           try {
             const data = await getList({ menuName });
@@ -261,6 +262,7 @@ export default function Menu() {
         onFinish={async (data) => {
           if (formData) {
             data.menuId = formData.menuId;
+            data.menuIcon = data.menuIcon || ''
             await editReq(data);
           } else {
             await addReq(data);

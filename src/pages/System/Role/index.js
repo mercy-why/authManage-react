@@ -3,7 +3,7 @@ import { initReq, addReq, editReq, deleteReq } from "./services";
 import { Button, Space, Popconfirm } from "antd";
 import { useState, useRef } from "react";
 import { BetaSchemaForm } from "@ant-design/pro-form";
-import { defaultModalFormSetting } from "@/settings";
+import { defaultModalFormSetting, defaultTableSetting } from "@/settings";
 import useModal from "@/hooks/useModal";
 import DistrubModal from "./distrubModal";
 import Access from "@/components/Access";
@@ -144,7 +144,7 @@ export default function Role() {
         columns={columns}
         request={initReq}
         actionRef={actionRef}
-        revalidateOnFocus={false}
+        {...defaultTableSetting}
       />
 
       <BetaSchemaForm

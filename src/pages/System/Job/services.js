@@ -6,3 +6,24 @@ export const getPositionPage = (data) => {
     data,
   });
 };
+
+export const addReq = (data) => {
+  return request({
+    url: "/position/addPosition",
+    data,
+  });
+};
+
+export const editReq = (data) => {
+    return request({
+      url: "/position/updatePositionById",
+      data,
+    });
+  };
+
+  export const delReq = (data) => {
+    return request({
+      url: "/position/deletePositionById",
+      data,
+    });
+  };

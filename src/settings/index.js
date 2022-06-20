@@ -8,3 +8,11 @@ export const defaultModalFormSetting = {
     destroyOnClose: true,
   },
 };
+
+export const defaultTableSetting = {
+  revalidateOnFocus: false,
+  pagination: {
+    pageSize: 10,
+    showSizeChanger: true,
+  },
+};
