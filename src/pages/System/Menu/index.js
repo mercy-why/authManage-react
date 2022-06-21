@@ -9,7 +9,7 @@ import InterfaceModal from "./interfaceModal";
 import useModal from "@/hooks/useModal";
 import * as Icons from "@ant-design/icons";
 import Access from "@/components/Access";
-import { UserContext } from "@/layout";
+import { UserContext } from "@/context";
 
 const defaultRules = [
   {

@@ -1,18 +1,11 @@
-import {
-  useState,
-  createElement,
-  useRef,
-  useEffect,
-  createContext,
-} from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import ProLayout from "@ant-design/pro-layout";
 import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
-import { getLoginUserInfoReq, logoutReq } from "./services";
+import { logoutReq } from "./services";
 import { Avatar, Space, Select, Menu, Dropdown } from "antd";
 import { UserOutlined } from "@ant-design/icons";
-import * as Icons from "@ant-design/icons";
 import { SearchOutlined, CaretDownOutlined } from "@ant-design/icons";
-export const UserContext = createContext({});
+import { UserContext } from "@/context";
 
 export default function Layout() {
   const defaultProps = {
@@ -26,78 +19,8 @@ export default function Layout() {
   };
   const navigate = useNavigate();
   const selectRef = useRef();
-  const [searchOptions, setOptions] = useState([]);
   const [searchVisible, setSearchVisible] = useState(false);
-  const [user, setUser] = useState({});
-  const uniqueList = (arr) => {
-    if (arr?.length === 0) {
-      return [];
-    }
-    const uniButtonObj = {};
-    const uniMenusObj = {};
-    const uniResourcesObj = {};
-    const roles = [];
-    for (const item of arr) {
-      for (const value of item.menuButtons) {
-        if (!uniButtonObj[value.buttonId]) {
-          uniButtonObj[value.buttonId] = value;
-        }
-      }
-      for (const value of item.menus) {
-        if (!uniMenusObj[value.menuId]) {
-          uniMenusObj[value.menuId] = value;
-        }
-      }
-      for (const value of item.resources) {
-        if (!uniResourcesObj[value.resourceId]) {
-          uniResourcesObj[value.resourceId] = value;
-        }
-      }
-      roles.push(item.role);
-    }
-    return {
-      buttons: Object.values(uniButtonObj),
-      menus: Object.values(uniMenusObj),
-      resources: Object.values(uniResourcesObj),
-      roles,
-    };
-  };
-
-  const loopMenuItem = (menus) => {
-    const arr = [];
-    const options = [];
-    menus.forEach((item, i, array) => {
-      const { menuId, menuName, menuRouter, menuIcon, menuParentId } = item;
-      const newItem = {
-        key: menuId,
-        name: menuName,
-        path: menuRouter,
-        icon: Icons[menuIcon] && createElement(Icons[menuIcon], {}),
-        routes: [],
-      };
-      if (menuParentId === "0") {
-        array.forEach((x) => {
-          if (x.menuParentId === menuId) {
-            newItem.routes.push({
-              key: x.menuId,
-              name: x.menuName,
-              path: x.menuRouter,
-              icon: Icons[x.menuIcon] && createElement(Icons[x.menuIcon], {}),
-            });
-            options.push({
-              key: x.menuId,
-              value: x.menuRouter,
-              label: menuName + " > " + x.menuName,
-            });
-          }
-        });
-        arr.push(newItem);
-      }
-    });
-    setOptions(options);
-    return arr;
-  };
-
+  const { user, setUser } = useContext(UserContext);
   const onSelect = (value) => {
     setSearchVisible(false);
     navigate(value);
@@ -143,7 +66,7 @@ export default function Layout() {
               bordered={false}
               showArrow={false}
               placeholder="Search"
-              options={searchOptions}
+              options={user.searchOptions}
               optionFilterProp="label"
               style={{
                 minWidth: 180,
@@ -169,38 +92,14 @@ export default function Layout() {
 
   const location = useLocation();
   return (
-    <UserContext.Provider value={{ user, setUser }}>
-      <ProLayout
-        {...defaultProps}
-        location={location}
-        menu={{
-          request: async () => {
-            try {
-              const data = await getLoginUserInfoReq();
-              const { menus, buttons, resources, roles } = uniqueList(
-                data.permissions
-              );
-              setUser({
-                menus,
-                buttons,
-                resources,
-                nickName: data.nickName,
-                hasAccess: (code) => {
-                  const isAdmin = roles.some((x) => x.roleCode === "admin");
-                  return isAdmin || buttons?.some((x) => x.buttonCode === code);
-                },
-              });
-              return loopMenuItem(menus);
-            } catch (error) {
-              return null;
-            }
-          },
-        }}
-        rightContentRender={renderHeader}
-        menuItemRender={(item, dom) => <Link to={item.path}>{dom}</Link>}
-      >
-        <Outlet />
-      </ProLayout>
-    </UserContext.Provider>
+    <ProLayout
+      {...defaultProps}
+      location={location}
+      menuDataRender={() => user.routes}
+      rightContentRender={renderHeader}
+      menuItemRender={(item, dom) => <Link to={item.path}>{dom}</Link>}
+    >
+      <Outlet />
+    </ProLayout>
   );
 }

@@ -1,5 +1,6 @@
 import { useContext } from "react";
-import { UserContext } from "@/layout";
+import { UserContext } from "@/context";
+
 export default function Access({ children, buttonCode }) {
   const { user } = useContext(UserContext);
   const { hasAccess } = user;

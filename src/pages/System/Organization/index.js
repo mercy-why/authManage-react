@@ -13,6 +13,35 @@ const defaultRules = [
   },
 ];
 
+function getParentNames(orgParentId, data) {
+  if (orgParentId === "0") {
+    return [];
+  }
+  // 深度遍历查找
+  function dfs(data, orgParentId, parents) {
+    for (var i = 0; i < data.length; i++) {
+      var item = data[i];
+      // 找到orgId则返回父级orgName
+      if (item.orgId === orgParentId) {
+        parents.shift();
+        parents.push(item.orgName);
+        return parents;
+      }
+      // children不存在或为空则不递归
+      if (!item.children || !item.children.length) continue;
+      // 往下查找时将当前orgName入栈
+      parents.push(item.orgName);
+      if (dfs(item.children, orgParentId, parents).length) return parents;
+      // 深度遍历查找未找到时当前orgId 出栈
+      parents.pop();
+    }
+    // 未找到时返回空数组
+    return [];
+  }
+
+  return dfs(data, orgParentId, []);
+}
+
 export default function Organization() {
   const [modalState, addFn, editFn, clearFn] = useModal();
   const actionRef = useRef();
@@ -30,7 +59,6 @@ export default function Organization() {
         options: orgTree,
         allowClear: true,
         treeDefaultExpandAll: true,
-        defaultValue: "0",
         fieldNames: {
           label: "orgName",
           value: "orgId",
@@ -60,6 +88,7 @@ export default function Organization() {
       formItemProps: {
         rules: defaultRules,
       },
+      valueType: "digit",
     },
     {
       title: "状态",
@@ -91,7 +120,14 @@ export default function Organization() {
       render: (t, record) => (
         <Space>
           <Access menuButton="org-edit">
-            <a key="edit" onClick={() => editFn(record)}>
+            <a
+              key="edit"
+              onClick={() =>
+                editFn({
+                  ...record,
+                })
+              }
+            >
               修改
             </a>
           </Access>
@@ -139,13 +175,16 @@ export default function Organization() {
               children: data,
             },
           ]);
-
           return { success: true, data };
         }}
       />
       <BetaSchemaForm
         {...defaultModalFormSetting}
-        initialValues={formData || { orgParentId: "0" }}
+        initialValues={
+          formData || {
+            orgParentId: "0",
+          }
+        }
         layoutType="ModalForm"
         visible={visible}
         title={`${formData ? "修改" : "添加"}部门`}
@@ -155,6 +194,12 @@ export default function Organization() {
           }
         }}
         onFinish={async (data) => {
+          const parentName = getParentNames(data.orgParentId, orgTree).join(
+            "/"
+          );
+          data.orgPath = parentName
+            ? "/" + parentName + "/" + data.orgName
+            : "/" + data.orgName;
           if (formData) {
             data.orgId = formData.orgId;
             await editReq(data);

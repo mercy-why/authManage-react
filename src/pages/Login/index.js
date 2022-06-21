@@ -41,8 +41,8 @@ export default function Login() {
   return (
     <div className={style.loginX}>
       <LoginFormPage
-        title="Github"
-        subTitle="全球最大同性交友网站"
+        title="CMS"
+        subTitle="后台管理系统"
         onFinish={loginFn}
         backgroundImageUrl="https://gw.alipayobjects.com/zos/rmsportal/FfdJeJRQWjEeGTpqgBKj.png"
         logo="https://github.githubassets.com/images/modules/logos_page/Octocat.png"
