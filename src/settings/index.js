@@ -6,6 +6,7 @@ export const defaultModalFormSetting = {
   layout: "horizontal",
   modalProps: {
     destroyOnClose: true,
+    maskClosable: false,
   },
 };
 

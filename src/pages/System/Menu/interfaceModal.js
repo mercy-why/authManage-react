@@ -124,9 +124,9 @@ export default function InterfaceModal({
     <>
       <Modal
         visible={visible}
-        title="菜单接口管理"
+        title="接口管理"
         width={1000}
-        bodyStyle={{ maxHeight: 600, overflow: 'auto' }}
+        bodyStyle={{ maxHeight: 600, overflow: "auto" }}
         onCancel={onCancel}
         destroyOnClose
         footer={null}
@@ -173,6 +173,9 @@ export default function InterfaceModal({
             record: () => ({
               resourceId: (Math.random() * 1000000).toFixed(0),
               type: "add",
+              requiredLoginFlag: "Y",
+              requiredPermissionFlag: "Y",
+              statusFlag: "1",
             }),
           }}
         />

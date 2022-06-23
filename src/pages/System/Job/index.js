@@ -113,13 +113,13 @@ function Job() {
         headerTitle={addBtn}
         actionRef={actionRef}
         request={async ({
-          current: pageNo,
+          current: pageNum,
           pageSize,
           positionName,
           positionCode,
         }) => {
           const { list, totalCount } = await getPositionPage({
-            pageNo,
+            pageNum,
             pageSize,
             positionName,
             positionCode,

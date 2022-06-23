@@ -6,6 +6,9 @@ const service = axios.create({
   baseURL: "/api",
   timeout: 1000 * 60 * 5,
   method: "post",
+  validateStatus: function (status) {
+    return status < 400; // Resolve only if the status code is less than 500
+  },
 });
 
 service.interceptors.request.use(
@@ -28,11 +31,13 @@ service.interceptors.response.use(
     return withFullResponse ? response : response.data;
   },
   (error) => {
-    const { status } = error?.response || {};
+    const { status } = error.response || {};
     let msg = error?.response.data;
-    if (typeof msg === 'object') {
+    console.log(error);
+    if (typeof msg === "object") {
       msg = codeMessage[status];
     }
+    message.destroy();
     message.error(msg || "请求错误");
     if (status === 401) {
       localStorage.clear();

@@ -89,7 +89,7 @@ export default function BtnModal({ btnState, setBtnState, reloadFn }) {
     <>
       <Modal
         visible={visible}
-        title="菜单按钮管理"
+        title="按钮管理"
         width={800}
         onCancel={onCancel}
         destroyOnClose
@@ -129,7 +129,7 @@ export default function BtnModal({ btnState, setBtnState, reloadFn }) {
             record: () => ({
               buttonId: (Math.random() * 1000000).toFixed(0),
               type: "add",
-              statusFlag: '1'
+              statusFlag: '1',
             }),
           }}
         />

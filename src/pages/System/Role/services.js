@@ -35,19 +35,19 @@ const assignPermissions = (data) =>
 
 export const getPermissionsByRoleId = (data) =>
   request({
-    url: `${PREFIX}/getPermissionsByRoleId`,
+    url: `${PREFIX}/getPermissionByRoleId`,
     data,
   });
 
 export const initReq = async ({
-  current: pageNo,
+  current: pageNum,
   pageSize,
   roleName,
   roleCode,
 }) => {
   try {
     const { list, totalCount } = await getList({
-      pageNo,
+      pageNum,
       pageSize,
       roleName,
       roleCode,
@@ -100,3 +100,10 @@ export const distrubReq = async (data) => {
     return Promise.reject(error);
   }
 };
+
+
+export const getMenuTree = (data = {}) =>
+  request({
+    url: `${PREFIX}/getMenuTree`,
+    data,
+  });

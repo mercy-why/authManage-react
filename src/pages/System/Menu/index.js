@@ -31,6 +31,15 @@ export default function Menu() {
   const { formData, visible } = modalState;
   const { user } = useContext(UserContext);
   const { hasAccess } = user;
+  const menuDom = hasAccess
+    ? [
+        hasAccess("menu-btn") && { key: "btn", name: "按钮管理" },
+        hasAccess("menu-resource") && {
+          key: "interface",
+          name: "接口管理",
+        },
+      ]
+    : [];
   const actionRef = useRef();
   const [btnState, setBtnState] = useState({
     visible: false,
@@ -104,11 +113,6 @@ export default function Menu() {
       formItemProps: {
         rules: defaultRules,
       },
-      search: false,
-    },
-    {
-      title: "组件路径",
-      dataIndex: "menuComponent",
       search: false,
     },
     {
@@ -192,13 +196,7 @@ export default function Menu() {
             <TableDropdown
               key="actionGroup"
               onSelect={(key) => actionFn(key, record)}
-              menus={[
-                hasAccess("menu-btn") && { key: "btn", name: "按钮管理" },
-                hasAccess("menu-resource") && {
-                  key: "interface",
-                  name: "接口管理",
-                },
-              ]}
+              menus={menuDom}
             ></TableDropdown>
           ) : null}
         </Space>

@@ -1,8 +1,7 @@
 import { Modal, Tree, Tag, Space, Button } from "antd";
 import { useState, useEffect } from "react";
-import { getList } from "../Menu/services";
 import { useEffectOnce } from "@/hooks/utils";
-import { distrubReq, getPermissionsByRoleId } from "./services";
+import { distrubReq, getPermissionsByRoleId, getMenuTree } from "./services";
 
 export default function DistrubBtnModal({ distrubState, cancelFn }) {
   const { visible, roleId } = distrubState;
@@ -22,7 +21,7 @@ export default function DistrubBtnModal({ distrubState, cancelFn }) {
     const list = buttons.map((x) => {
       ids.push({ buttonId: x.buttonId, menuId: x.menuId });
       return {
-        key: x.buttonId,
+        key: "button-" + x.buttonId + "&MenuId-" + x.menuId,
         buttonId: x.buttonId,
         menuId: x.menuId,
         title: (
@@ -46,7 +45,7 @@ export default function DistrubBtnModal({ distrubState, cancelFn }) {
     const list = resources.map((x) => {
       ids.push({ resourceId: x.resourceId });
       return {
-        key: x.resourceId,
+        key: "resource-" + x.resourceId,
         resourceId: x.resourceId,
         title: (
           <Space>
@@ -63,7 +62,7 @@ export default function DistrubBtnModal({ distrubState, cancelFn }) {
   };
 
   const transformChildren = (children, buttons, resources, menuId) => {
-    if (children) {
+    if (children?.length > 0) {
       return loopTree(children);
     } else {
       const buttonList = transformButtons(buttons);
@@ -104,7 +103,7 @@ export default function DistrubBtnModal({ distrubState, cancelFn }) {
               )}
             </Space>
           ),
-          key: menuId,
+          key: "menu-" + menuId,
           menuId,
           children: transformChildren(children, buttons, resources, menuId),
         };
@@ -112,9 +111,6 @@ export default function DistrubBtnModal({ distrubState, cancelFn }) {
     );
   };
   const transformIds = (nodes) => {
-    if (!nodes) {
-      return {};
-    }
     const obj = {
       role: {
         roleId,
@@ -124,34 +120,45 @@ export default function DistrubBtnModal({ distrubState, cancelFn }) {
       resources: [],
     };
     nodes.forEach((item) => {
-      item.menuId && obj.menus.push({ menuId: item.menuId });
-      item.buttonId &&
-        obj.menuButtons.push({ buttonId: item.buttonId, menuId: item.menuId });
-      item.resourceId && obj.resources.push({ resourceId: item.resourceId });
+      item.includes("menu-") &&
+        obj.menus.push({ menuId: item.replace("menu-", "") });
+      if (item.includes("button-")) {
+        const arr = item.split("&MenuId-");
+        obj.menuButtons.push({
+          buttonId: arr[0].replace("button-", ""),
+          menuId: arr[1],
+        });
+      }
+
+      item.includes("resource-") &&
+        obj.resources.push({ resourceId: item.replace("resource-", "") });
     });
     return obj;
   };
   const onCheck = (checkedKeys, e) => {
     setCheckKeys(checkedKeys);
-    setResult(transformIds(e.checkedNodes));
+    setResult(transformIds([...checkedKeys, ...e.halfCheckedKeys]));
   };
 
   const [treeData, setTreeData] = useState([]);
 
   const initList = async () => {
     try {
-      const res = await getList();
+      const res = await getMenuTree();
       setTreeData(loopTree(res));
     } catch (error) {
       console.log(error);
     }
   };
-  const loopMenuIds = (data, menuList, menuIds) => {
+  const loopMenuIds = (data, menuList, menus) => {
     data.forEach((item) => {
-      if (menuIds.includes(item.menuId) && !item.children?.length) {
-        menuList.push(item.menuId);
+      if (
+        menus.some((x) => x.menuId === item.menuId) &&
+        !item.children?.length
+      ) {
+        menuList.push(item.key);
       } else if (item.children?.length > 0) {
-        loopMenuIds(item.children, menuList, menuIds);
+        loopMenuIds(item.children, menuList, menus);
       }
     });
     return menuList;
@@ -159,12 +166,13 @@ export default function DistrubBtnModal({ distrubState, cancelFn }) {
   const initCheckList = async (roleId) => {
     try {
       const res = await getPermissionsByRoleId({ roleId });
-      const { buttonIds, menuIds, resourceIds } = res;
-      const menus = menuIds?.split(",") || [];
+      const { resources, menuButtons, menus } = res;
       const keys = [
-        ...(buttonIds?.split(",") || []),
+        ...(menuButtons?.map(
+          (x) => "button-" + x.buttonId + "&MenuId-" + x.menuId
+        ) || []),
         ...loopMenuIds(treeData, [], menus),
-        ...(resourceIds?.split(",") || []),
+        ...(resources?.map((x) => "resource-" + x.resourceId) || []),
       ];
       setCheckKeys(keys);
     } catch (error) {
@@ -183,7 +191,12 @@ export default function DistrubBtnModal({ distrubState, cancelFn }) {
 
   const chooseNull = () => {
     setCheckKeys([]);
-    setResult(null);
+    setResult({
+      menuButtons: [],
+      menus: [],
+      resources: [],
+      role: { roleId },
+    });
   };
   const onCancel = () => {
     cancelFn();
@@ -208,9 +221,9 @@ export default function DistrubBtnModal({ distrubState, cancelFn }) {
   const chooseAll = () => {
     const { menuButtons, menus, resources } = allKeys;
     setCheckKeys([
-      ...menuButtons.map((x) => x.buttonId),
-      ...menus.map((x) => x.menuId),
-      ...resources.map((x) => x.resourceId),
+      ...menuButtons.map((x) => "button-" + x.buttonId + "&MenuId-" + x.menuId),
+      ...menus.map((x) => "menu-" + x.menuId),
+      ...resources.map((x) => "resource-" + x.resourceId),
     ]);
     setResult({ ...allKeys, role: { roleId } });
   };
