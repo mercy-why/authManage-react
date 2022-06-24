@@ -110,9 +110,6 @@ export default function Menu() {
     {
       title: "路由地址",
       dataIndex: "menuRouter",
-      formItemProps: {
-        rules: defaultRules,
-      },
       search: false,
     },
     {
@@ -174,12 +171,12 @@ export default function Menu() {
       hideInForm: true,
       render: (t, record) => (
         <Space>
-          <Access menuButton="role-edit">
+          <Access buttonCode="menu-edit">
             <a key="edit" onClick={() => editFn(record)}>
               修改
             </a>
           </Access>
-          <Access menuButton="role-delete">
+          <Access buttonCode="menu-delete">
             <Popconfirm
               title="是否确定删除此条？"
               okText="是"
@@ -205,7 +202,7 @@ export default function Menu() {
   ];
 
   const addBtn = (
-    <Access menuButton="role-add">
+    <Access buttonCode="menu-add">
       <Button key="primary" type="primary" onClick={addFn}>
         添加
       </Button>

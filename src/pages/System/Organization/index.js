@@ -119,7 +119,7 @@ export default function Organization() {
       hideInForm: true,
       render: (t, record) => (
         <Space>
-          <Access menuButton="org-edit">
+          <Access buttonCode="org-edit">
             <a
               key="edit"
               onClick={() =>
@@ -131,7 +131,7 @@ export default function Organization() {
               修改
             </a>
           </Access>
-          <Access menuButton="org-delete">
+          <Access buttonCode="org-delete">
             <Popconfirm
               title="是否确定删除此条？"
               okText="是"
@@ -150,7 +150,7 @@ export default function Organization() {
   ];
 
   const addBtn = (
-    <Access buttonCode="job-add">
+    <Access buttonCode="org-add">
       <Button key="primary" type="primary" onClick={addFn}>
         添加
       </Button>

@@ -7,7 +7,7 @@ const service = axios.create({
   timeout: 1000 * 60 * 5,
   method: "post",
   validateStatus: function (status) {
-    return status < 400; // Resolve only if the status code is less than 500
+    return status < 400; // Resolve only if the status code is less than 400
   },
 });
 
@@ -32,11 +32,7 @@ service.interceptors.response.use(
   },
   (error) => {
     const { status } = error.response || {};
-    let msg = error?.response.data;
-    console.log(error);
-    if (typeof msg === "object") {
-      msg = codeMessage[status];
-    }
+    const msg = codeMessage[status];
     message.destroy();
     message.error(msg || "请求错误");
     if (status === 401) {

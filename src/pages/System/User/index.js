@@ -66,10 +66,8 @@ function User() {
     });
   };
   useEffect(() => {
-    if (visible && !modalOptions.roleOptions.length) {
-      initOptions();
-    }
-  }, [visible]);
+    initOptions();
+  }, []);
   const columns = [
     {
       title: "用户名称",
@@ -77,7 +75,6 @@ function User() {
       formItemProps: {
         rules: defaultRules,
       },
-      search: false,
     },
     {
       title: "用户账号",
@@ -87,13 +84,33 @@ function User() {
       },
     },
     {
+      title: "用户角色",
+      dataIndex: "roles",
+      render: (t) => t?.map((x) => x.roleName).join(),
+    },
+    {
       title: "部门",
       dataIndex: "orgs",
       formItemProps: {
         rules: defaultRules,
       },
-      search: false,
-      render: (t) => t?.map((x) => x.orgName).join(),
+      // valueType: "treeSelect",
+      // fieldProps: {
+      //   treeDefaultExpandAll: true,
+      //   options: modalOptions.orgOptions,
+      //   allowClear: true,
+      //   fieldNames: {
+      //     label: "orgName",
+      //     value: "orgId",
+      //   },
+      //   labelInValue: true,
+      //   showSearch: true,
+      //   treeNodeFilterProp: "orgName",
+      //   filterTreeNode: (input,node) => {
+      //     console.log(input,node);
+      //   },
+      // },
+      render: (t, r) => r.orgs?.map((x) => x.orgName).join(),
     },
     {
       title: "岗位",
@@ -101,7 +118,6 @@ function User() {
       formItemProps: {
         rules: defaultRules,
       },
-      search: false,
       render: (t) => t?.map((x) => x.positionName).join(),
     },
     {
@@ -184,12 +200,23 @@ function User() {
         columns={columns}
         headerTitle={addBtn}
         actionRef={actionRef}
-        request={async ({ current: pageNum, pageSize, realName, account }) => {
+        request={async ({
+          current: pageNum,
+          pageSize,
+          realName,
+          account,
+          orgs,
+          positions,
+          roles,
+        }) => {
           const { list, totalCount } = await getList({
             pageNum,
             pageSize,
             realName,
             account,
+            orgName: orgs,
+            positionName: positions,
+            roleName: roles,
           });
           return { success: true, data: list, total: totalCount };
         }}
@@ -234,6 +261,7 @@ function User() {
             width="md"
             name="orgIds"
             label="归属部门"
+            valueType="treeSelect"
             placeholder="请选择归属部门"
             fieldProps={{
               treeDefaultExpandAll: true,
@@ -242,11 +270,9 @@ function User() {
                 label: "orgName",
                 value: "orgId",
               },
-              filterTreeNode: (input, node) => {
-                console.log(input,node);
-                return node.orgName.includes(input);
-              },
+              treeNodeFilterProp: "orgName",
               multiple: true,
+              showSearch: false,
             }}
             rules={defaultRules}
           />

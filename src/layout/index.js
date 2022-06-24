@@ -1,6 +1,12 @@
 import { useState, createElement, useRef, useEffect } from "react";
 import ProLayout from "@ant-design/pro-layout";
-import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
+import {
+  Outlet,
+  useLocation,
+  Link,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
 import { getLoginUserInfoReq, logoutReq } from "./services";
 import { Avatar, Space, Select, Menu, Dropdown } from "antd";
 import { UserOutlined } from "@ant-design/icons";
@@ -23,6 +29,7 @@ export default function Layout() {
   const [searchOptions, setOptions] = useState([]);
   const [searchVisible, setSearchVisible] = useState(false);
   const [user, setUser] = useState({});
+  const [canAccess, setCanAccess] = useState(true);
   const uniqueList = (arr) => {
     if (arr?.length === 0) {
       return [];
@@ -161,7 +168,7 @@ export default function Layout() {
         <Dropdown overlay={menuDom}>
           <Space className="cur">
             <Avatar shape="square" size="small" icon={<UserOutlined />} />
-            <span>{user?.nickName}</span>
+            <span>{user?.realName}</span>
             <CaretDownOutlined className="dp-icon" />
           </Space>
         </Dropdown>
@@ -170,8 +177,16 @@ export default function Layout() {
   };
 
   const location = useLocation();
-  console.log(user.menus?.some((x) => location.pathname === x.menuRouter));
-
+  useEffect(() => {
+    const menus = user.menus;
+    const pathname = location.pathname.replace("/", "");
+    if (menus) {
+      setCanAccess(
+        menus?.some((x) => pathname === x.menuRouter.replace("/", "")) ||
+          pathname === ""
+      );
+    }
+  }, [location, user]);
   return (
     <UserContext.Provider value={{ user, setUser }}>
       <ProLayout
@@ -188,7 +203,7 @@ export default function Layout() {
                 menus,
                 buttons,
                 resources,
-                nickName: data.nickName,
+                realName: data.realName,
                 hasAccess: (code) => {
                   const isAdmin = roles.some((x) => x.roleCode === "admin");
                   return isAdmin || buttons?.some((x) => x.buttonCode === code);
@@ -210,7 +225,7 @@ export default function Layout() {
           );
         }}
       >
-        <Outlet />
+        {canAccess ? <Outlet /> : <Navigate to="403" />}
       </ProLayout>
     </UserContext.Provider>
   );
