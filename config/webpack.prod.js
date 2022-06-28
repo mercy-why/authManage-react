@@ -1,31 +1,37 @@
-const glob = require('glob')
-const { merge } = require('webpack-merge');
-const TerserPlugin = require('terser-webpack-plugin');
+const glob = require("glob");
+const { merge } = require("webpack-merge");
+const TerserPlugin = require("terser-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin =
+  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const PurgeCSSPlugin = require('purgecss-webpack-plugin')
-const common = require('./webpack.common')
-const paths = require('./paths')
+const PurgeCSSPlugin = require("purgecss-webpack-plugin");
+const common = require("./webpack.common");
+const paths = require("./paths");
+const webpack = require("webpack");
 
 module.exports = merge(common, {
   // 模式
-  mode: 'production',
+  mode: "production",
   plugins: [
     // 打包体积分析
     // new BundleAnalyzerPlugin(),
     // 提取 CSS
     new MiniCssExtractPlugin({
-      filename: 'css/[name].[contenthash:8].css',
+      filename: "css/[name].[contenthash:8].css",
     }),
     // CSS Tree Shaking
     new PurgeCSSPlugin({
-      paths: glob.sync(`${paths.appSrc}/**/*`,  { nodir: true }),
+      paths: glob.sync(`${paths.appSrc}/**/*`, { nodir: true }),
+    }),
+    new webpack.DefinePlugin({
+      "process.env.BASE_URL": JSON.stringify(""),
+      __DEV__: false,
     }),
   ],
   optimization: {
     runtimeChunk: true,
-    moduleIds: 'deterministic',
+    moduleIds: "deterministic",
     minimizer: [
       new CssMinimizerPlugin(),
       new TerserPlugin({
@@ -39,7 +45,7 @@ module.exports = merge(common, {
             warnings: false,
             comparisons: false,
             inline: 2,
-            pure_funcs: ['console.log']
+            pure_funcs: ["console.log"],
           },
           mangle: {
             safari10: true,
@@ -54,17 +60,18 @@ module.exports = merge(common, {
     ],
     splitChunks: {
       // include all types of chunks
-      chunks: 'all',
+      chunks: "all",
       // 重复打包问题
-      cacheGroups:{
-        vendors:{ // node_modules里的代码
+      cacheGroups: {
+        vendors: {
+          // node_modules里的代码
           test: /[\\/]node_modules[\\/]/,
           chunks: "all",
           // name: 'vendors', 一定不要定义固定的name
           priority: 10, // 优先级
-          enforce: true 
-        }
-      }
+          enforce: true,
+        },
+      },
     },
   },
-})
+});

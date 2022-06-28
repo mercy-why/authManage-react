@@ -76,17 +76,19 @@ export default function Layout() {
     const arr = [];
     const options = [];
     menus.forEach((item, i, array) => {
-      const { menuId, menuName, menuRouter, menuIcon, menuParentId } = item;
+      const { menuId, menuName, menuRouter, menuIcon, menuParentId, hide } =
+        item;
       const newItem = {
         key: menuId,
         name: menuName,
         path: menuRouter,
+        hide,
         icon: Icons[menuIcon] && createElement(Icons[menuIcon], {}),
         routes: [],
       };
-      if (menuParentId === "0") {
+      if (menuParentId === "0" && hide === "0") {
         array.forEach((x) => {
-          if (x.menuParentId === menuId) {
+          if (x.menuParentId === menuId && x.hide === "0") {
             newItem.routes.push({
               key: x.menuId,
               name: x.menuName,
@@ -100,7 +102,9 @@ export default function Layout() {
             });
           }
         });
-        arr.push(newItem);
+        if (hide === "0") {
+          arr.push(newItem);
+        }
       }
     });
     setOptions(options);
@@ -125,6 +129,8 @@ export default function Layout() {
       logoutReq();
       setUser(null);
       navigate("login");
+    } else if (key === "editProfile") {
+      navigate("profile");
     }
   };
 
@@ -132,6 +138,10 @@ export default function Layout() {
     <Menu
       onClick={menuFn}
       items={[
+        {
+          key: "editProfile",
+          label: "修改个人信息",
+        },
         {
           key: "logout",
           label: "退出登录",
@@ -167,8 +177,17 @@ export default function Layout() {
         </div>
         <Dropdown overlay={menuDom}>
           <Space className="cur">
-            <Avatar shape="square" size="small" icon={<UserOutlined />} />
-            <span>{user?.realName}</span>
+            <Avatar
+              shape="square"
+              size="small"
+              src={
+                user.info?.avatar
+                  ? process.env.BASE_URL + user.info?.avatar
+                  : null
+              }
+              icon={<UserOutlined />}
+            />
+            <span>{user.info?.realName}</span>
             <CaretDownOutlined className="dp-icon" />
           </Space>
         </Dropdown>
@@ -196,14 +215,13 @@ export default function Layout() {
           request: async () => {
             try {
               const data = await getLoginUserInfoReq();
-              const { menus, buttons, resources, roles } = uniqueList(
-                data.permissions
-              );
+              const { permissions, ...info } = data;
+              const { menus, buttons, resources, roles } = uniqueList(permissions);
               setUser({
                 menus,
                 buttons,
                 resources,
-                realName: data.realName,
+                info,
                 hasAccess: (code) => {
                   const isAdmin = roles.some((x) => x.roleCode === "admin");
                   return isAdmin || buttons?.some((x) => x.buttonCode === code);

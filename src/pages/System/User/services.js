@@ -47,3 +47,5 @@ export const getPositionList = (data = {}) => {
     data,
   });
 };
+
+export const actionUrl = process.env.BASE_URL + "/user/uploadAvatar";

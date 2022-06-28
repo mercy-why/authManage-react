@@ -113,7 +113,7 @@ function OnlineUser() {
         rowKey={ROWKEYID}
         {...defaultTableSetting}
         columns={columns}
-        headerTitle={addBtn}
+        // headerTitle={addBtn}
         actionRef={actionRef}
         request={async ({ current: pageNum, pageSize }) => {
           const { list, totalCount } = await getList({

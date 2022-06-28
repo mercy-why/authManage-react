@@ -7,6 +7,7 @@ import {
   getRoleList,
   getOrgTreeReq,
   getPositionList,
+  actionUrl,
 } from "./services";
 import Access from "@/components/Access";
 import { Button, message, Space, Popconfirm } from "antd";
@@ -20,6 +21,7 @@ import {
   ProFormSelect,
   ProFormTreeSelect,
   ProFormRadio,
+  ProFormUploadButton,
 } from "@ant-design/pro-form";
 import { useRef, useState, useEffect } from "react";
 
@@ -29,7 +31,6 @@ const defaultRules = [
     message: "此项为必填项",
   },
 ];
-
 function User() {
   const ROWKEY = "user";
   const ROWKEYID = "userId";
@@ -86,7 +87,7 @@ function User() {
     {
       title: "用户角色",
       dataIndex: "roles",
-      render: (t) => t?.map((x) => x.roleName).join(),
+      render: (t, r) => r.roles?.map((x) => x.roleName).join(),
     },
     {
       title: "部门",
@@ -94,22 +95,6 @@ function User() {
       formItemProps: {
         rules: defaultRules,
       },
-      // valueType: "treeSelect",
-      // fieldProps: {
-      //   treeDefaultExpandAll: true,
-      //   options: modalOptions.orgOptions,
-      //   allowClear: true,
-      //   fieldNames: {
-      //     label: "orgName",
-      //     value: "orgId",
-      //   },
-      //   labelInValue: true,
-      //   showSearch: true,
-      //   treeNodeFilterProp: "orgName",
-      //   filterTreeNode: (input,node) => {
-      //     console.log(input,node);
-      //   },
-      // },
       render: (t, r) => r.orgs?.map((x) => x.orgName).join(),
     },
     {
@@ -118,7 +103,7 @@ function User() {
       formItemProps: {
         rules: defaultRules,
       },
-      render: (t) => t?.map((x) => x.positionName).join(),
+      render: (t, r) => r.positions?.map((x) => x.positionName).join(),
     },
     {
       title: "状态",
@@ -158,9 +143,14 @@ function User() {
               onClick={() => {
                 const value = {
                   ...record,
-                  orgIds: record.orgs.map((item) => item.orgId),
-                  positionIds: record.positions.map((item) => item.positionId),
-                  roleIds: record.roles.map((item) => item.roleId),
+                  orgIds: record.orgs?.map((item) => item.orgId),
+                  positionIds: record.positions?.map((item) => item.positionId),
+                  roleIds: record.roles?.map((item) => item.roleId),
+                  avatar: [
+                    {
+                      url: record.avatar,
+                    },
+                  ],
                 };
                 editFn(value);
               }}
@@ -236,6 +226,7 @@ function User() {
           }
         }}
         onFinish={async (data) => {
+          data.avatar = data.avatar[0].response;
           if (formData) {
             data[ROWKEYID] = formData[ROWKEYID];
             await editReq(data);
@@ -256,25 +247,24 @@ function User() {
             placeholder="请输入用户名称"
             rules={defaultRules}
           />
-
-          <ProFormTreeSelect
+          <ProFormUploadButton
             width="md"
-            name="orgIds"
-            label="归属部门"
-            valueType="treeSelect"
-            placeholder="请选择归属部门"
+            name="avatar"
+            label="用户头像"
+            listType="picture-card"
+            showUploadList={false}
+            action={actionUrl}
             fieldProps={{
-              treeDefaultExpandAll: true,
-              options: modalOptions.orgOptions,
-              fieldNames: {
-                label: "orgName",
-                value: "orgId",
+              headers: {
+                Authorization: localStorage.getItem("Authorization"),
               },
-              treeNodeFilterProp: "orgName",
-              multiple: true,
-              showSearch: false,
+              data: (file) => {
+                return {
+                  fieldName: file.name,
+                };
+              },
+              maxCount: 1,
             }}
-            rules={defaultRules}
           />
         </Group>
         <Group>
@@ -335,6 +325,27 @@ function User() {
             }}
             options={modalOptions.positionOptions}
           />
+          <ProFormTreeSelect
+            width="md"
+            name="orgIds"
+            label="归属部门"
+            valueType="treeSelect"
+            placeholder="请选择归属部门"
+            fieldProps={{
+              treeDefaultExpandAll: true,
+              options: modalOptions.orgOptions,
+              fieldNames: {
+                label: "orgName",
+                value: "orgId",
+              },
+              treeNodeFilterProp: "orgName",
+              multiple: true,
+              showSearch: false,
+            }}
+            rules={defaultRules}
+          />
+        </Group>
+        <Group>
           <ProFormSelect
             width="md"
             name="roleIds"

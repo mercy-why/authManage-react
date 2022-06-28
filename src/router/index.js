@@ -9,6 +9,7 @@ import Organization from "@/pages/System/Organization";
 import NotFound from "@/pages/Others/notFound";
 import NoAuth from "@/pages/Others/noAuth";
 import Job from "@/pages/System/Job";
+import Profile from "@/pages/System/Profile";
 import OnlineUser from "@/pages/Monitor/OnlineUser";
 
 export default () => {
@@ -24,6 +25,7 @@ export default () => {
           <Route path="user" element={<User />}></Route>
           <Route path="organization" element={<Organization />}></Route>
           <Route path="job" element={<Job />}></Route>
+          <Route path="profile" element={<Profile />}></Route>
 
           <Route path="onlineUser" element={<OnlineUser />}></Route>
         </Route>

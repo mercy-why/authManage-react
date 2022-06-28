@@ -1,3 +1,4 @@
+
 module.exports = {
   presets: [
     ["@babel/preset-env"],
@@ -9,7 +10,6 @@ module.exports = {
     ],
   ],
   plugins: [
-    ['react-refresh/babel'],
     [
       "@babel/plugin-transform-runtime",
       {

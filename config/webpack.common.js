@@ -3,7 +3,6 @@ const WebpackBar = require("webpackbar");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const theme = require("./theme");
 const paths = require("./paths");
-
 const ctx = {
   isEnvDevelopment: process.env.NODE_ENV === "development",
   isEnvProduction: process.env.NODE_ENV === "production",
@@ -102,10 +101,10 @@ module.exports = {
     // 生成html，自动引入所有bundle
     new HtmlWebpackPlugin({
       title: "demo",
-      template: paths.appHtml
+      template: paths.appHtml,
     }),
     // 进度条
-    new WebpackBar(),
+    new WebpackBar()
   ],
   module: {
     rules: [

@@ -166,6 +166,25 @@ export default function Menu() {
       search: false,
     },
     {
+      title: "是否显示菜单",
+      dataIndex: "hide",
+      valueType: "radio",
+      valueEnum: {
+        0: {
+          text: "显示",
+          status: "Success",
+        },
+        1: {
+          text: "隐藏",
+          status: "Error",
+        },
+      },
+      formItemProps: {
+        rules: defaultRules,
+      },
+      search: false,
+    },
+    {
       title: "操作",
       hideInSearch: true,
       hideInForm: true,
@@ -244,7 +263,9 @@ export default function Menu() {
 
       <BetaSchemaForm
         {...defaultModalFormSetting}
-        initialValues={formData || { menuParentId: "0" }}
+        initialValues={
+          formData || { menuParentId: "0", statusFlag: "1", hide: "0" }
+        }
         layoutType="ModalForm"
         visible={visible}
         title={`${formData ? "修改" : "添加"}菜单`}
