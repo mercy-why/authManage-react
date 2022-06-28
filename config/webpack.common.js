@@ -7,6 +7,7 @@ const ctx = {
   isEnvDevelopment: process.env.NODE_ENV === "development",
   isEnvProduction: process.env.NODE_ENV === "production",
 };
+const webpack = require("webpack");
 
 const { isEnvDevelopment, isEnvProduction } = ctx;
 
@@ -104,7 +105,10 @@ module.exports = {
       template: paths.appHtml,
     }),
     // 进度条
-    new WebpackBar()
+    new WebpackBar(),
+    new webpack.DefinePlugin({
+      BASE_URL: isEnvDevelopment ? JSON.stringify("/api") : JSON.stringify(""),
+    }),
   ],
   module: {
     rules: [

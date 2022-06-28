@@ -182,7 +182,7 @@ export default function Layout() {
               size="small"
               src={
                 user.info?.avatar
-                  ? process.env.BASE_URL + user.info?.avatar
+                  ? BASE_URL + user.info?.avatar
                   : null
               }
               icon={<UserOutlined />}

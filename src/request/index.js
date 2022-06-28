@@ -3,7 +3,7 @@ import { message } from "antd";
 import codeMessage from "./codeMessage";
 
 const service = axios.create({
-  baseURL: process.env.BASE_URL,
+  baseURL: BASE_URL,
   timeout: 1000 * 60 * 5,
   method: "post",
   validateStatus: function (status) {

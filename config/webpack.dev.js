@@ -2,7 +2,6 @@ const { merge } = require("webpack-merge");
 const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 const common = require("./webpack.common");
 const proxy = require("./proxy");
-const webpack = require("webpack");
 
 const config = merge(common, {
   // 模式
@@ -23,10 +22,6 @@ const config = merge(common, {
   },
   plugins: [
     new ReactRefreshWebpackPlugin(),
-    new webpack.DefinePlugin({
-      "process.env.BASE_URL": JSON.stringify("/api"),
-      __DEV__: true,
-    }),
   ],
 });
 

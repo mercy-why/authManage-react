@@ -16,4 +16,4 @@ export const getLoginUserInfoReq = async (data) => {
   });
 };
 
-export const actionUrl = process.env.BASE_URL + "/user/uploadAvatar";
+export const actionUrl = BASE_URL + "/user/uploadAvatar";

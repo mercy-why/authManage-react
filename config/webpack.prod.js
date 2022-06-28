@@ -8,7 +8,6 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const PurgeCSSPlugin = require("purgecss-webpack-plugin");
 const common = require("./webpack.common");
 const paths = require("./paths");
-const webpack = require("webpack");
 
 module.exports = merge(common, {
   // 模式
@@ -23,10 +22,6 @@ module.exports = merge(common, {
     // CSS Tree Shaking
     new PurgeCSSPlugin({
       paths: glob.sync(`${paths.appSrc}/**/*`, { nodir: true }),
-    }),
-    new webpack.DefinePlugin({
-      "process.env.BASE_URL": JSON.stringify(""),
-      __DEV__: false,
     }),
   ],
   optimization: {
