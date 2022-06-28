@@ -107,7 +107,7 @@ module.exports = {
     // 进度条
     new WebpackBar(),
     new webpack.DefinePlugin({
-      BASE_URL: isEnvDevelopment ? JSON.stringify("/api") : JSON.stringify(""),
+      BASE_URL: isEnvDevelopment ? JSON.stringify("/api") : JSON.stringify("/api"),
     }),
   ],
   module: {

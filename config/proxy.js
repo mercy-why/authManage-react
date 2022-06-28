@@ -1,15 +1,15 @@
-const IP = "192.168.8.150";
+const IP = "124.223.71.100";
 
 module.exports = {
   "/api": {
-    target: "http://" + IP + ":8088",
+    target: "http://" + IP,
     changeOrign: true,
     pathRewrite: {
       "^/api": "",
     },
   },
   "/files": {
-    target: "http://" + IP + ":8088",
+    target: "http://" + IP,
     changeOrign: true,
   },
 };

@@ -28,10 +28,15 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response) => {
     const { withFullResponse } = response.config;
-    return withFullResponse ? response : response.data;
+    if (response.data) {
+      if (response.status === 200 || response.status === 201) {
+        return withFullResponse ? response : response.data;
+      }
+    }
+    return Promise.reject(response);
   },
   (error) => {
-    if (!error.config.noHandleError) {
+    if (!error?.config.noHandleError) {
       const { status } = error.response || {};
       const msg = codeMessage[status];
       message.destroy();
