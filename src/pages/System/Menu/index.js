@@ -71,7 +71,7 @@ export default function Menu() {
   };
   const columns = [
     {
-      title: "上级菜单",
+      title: "目录",
       dataIndex: "menuParentId",
       hideInTable: true,
       valueType: "treeSelect",

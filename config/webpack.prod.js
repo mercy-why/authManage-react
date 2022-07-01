@@ -5,9 +5,7 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const BundleAnalyzerPlugin =
   require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const PurgeCSSPlugin = require("purgecss-webpack-plugin");
 const common = require("./webpack.common");
-const paths = require("./paths");
 
 module.exports = merge(common, {
   // 模式
@@ -18,10 +16,6 @@ module.exports = merge(common, {
     // 提取 CSS
     new MiniCssExtractPlugin({
       filename: "css/[name].[contenthash:8].css",
-    }),
-    // CSS Tree Shaking
-    new PurgeCSSPlugin({
-      paths: glob.sync(`${paths.appSrc}/**/*`, { nodir: true }),
     }),
   ],
   optimization: {
@@ -51,6 +45,7 @@ module.exports = merge(common, {
             ascii_only: true,
           },
         },
+        extractComments: false
       }),
     ],
     splitChunks: {

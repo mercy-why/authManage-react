@@ -6,7 +6,7 @@ import {
 import { LockOutlined, UserOutlined, WalletOutlined } from "@ant-design/icons";
 import style from "./index.module.less";
 import { useNavigate } from "react-router-dom";
-import { Space } from "antd";
+import { message, Space } from "antd";
 import { getCaptchaReq, loginReq } from "./services";
 import { useState } from "react";
 import { useEffectOnce } from "@/hooks/utils";
@@ -21,6 +21,7 @@ export default function Login() {
       localStorage.setItem("Authorization", res.headers.authorization);
       navigate("/");
     } catch (error) {
+      message.error(error.response.data);
       initCatch();
     }
   };
@@ -47,8 +48,8 @@ export default function Login() {
         backgroundImageUrl="https://gw.alipayobjects.com/zos/rmsportal/FfdJeJRQWjEeGTpqgBKj.png"
         logo="https://github.githubassets.com/images/modules/logos_page/Octocat.png"
         initialValues={{
-          account: 'admin',
-          password: '123456'
+          account: "admin",
+          password: "123456",
         }}
       >
         <ProFormText

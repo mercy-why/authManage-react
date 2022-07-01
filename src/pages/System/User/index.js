@@ -148,7 +148,7 @@ function User() {
                   roleIds: record.roles?.map((item) => item.roleId),
                   avatar: [
                     {
-                      url: record.avatar,
+                      url: BASE_URL + record.avatar,
                     },
                   ],
                 };

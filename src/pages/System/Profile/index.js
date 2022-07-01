@@ -83,7 +83,7 @@ function Profile() {
         <ProForm
           initialValues={{
             ...info,
-            avatar: [{ url: info?.avatar }],
+            avatar: [{ url: info ? BASE_URL + info?.avatar : "" }],
             orgIds: info?.orgs?.map((item) => item.orgName).join(),
             positionIds: info?.positions
               .map((item) => item.positionName)

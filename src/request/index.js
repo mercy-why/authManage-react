@@ -6,9 +6,6 @@ const service = axios.create({
   baseURL: BASE_URL,
   timeout: 1000 * 60 * 5,
   method: "post",
-  validateStatus: function (status) {
-    return status < 400; // Resolve only if the status code is less than 400
-  },
 });
 
 service.interceptors.request.use(
@@ -28,7 +25,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response) => {
     const { withFullResponse } = response.config;
-    if (response.data) {
+    if (response) {
       if (response.status === 200 || response.status === 201) {
         return withFullResponse ? response : response.data;
       }

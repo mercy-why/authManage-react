@@ -1,12 +1,9 @@
-const IP = "124.223.71.100";
+const IP = "192.168.8.150:8088";
 
 module.exports = {
-  "/api": {
+  "/cms": {
     target: "http://" + IP,
     changeOrign: true,
-    pathRewrite: {
-      "^/api": "",
-    },
   },
   "/files": {
     target: "http://" + IP,

@@ -11,13 +11,13 @@ import NoAuth from "@/pages/Others/noAuth";
 import Job from "@/pages/System/Job";
 import Profile from "@/pages/System/Profile";
 import OnlineUser from "@/pages/Monitor/OnlineUser";
+import CacheMonitoring from "@/pages/Monitor/CacheMonitoring";
 
 export default () => {
   return (
     <HashRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route path="" element={<Navigate to="home" />} />
           <Route element={<Home />} index path="home" />
 
           <Route path="role" element={<Role />}></Route>
@@ -28,6 +28,7 @@ export default () => {
           <Route path="profile" element={<Profile />}></Route>
 
           <Route path="onlineUser" element={<OnlineUser />}></Route>
+          <Route path="cacheMonitoring" element={<CacheMonitoring />}></Route>
         </Route>
         <Route path="/login" element={<Login />}></Route>
         <Route path="403" element={<NoAuth />}></Route>
